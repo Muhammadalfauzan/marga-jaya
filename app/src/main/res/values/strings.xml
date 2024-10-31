@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Margajaya</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="detail">Detail</string>
+    <string name="history">History</string>
+    <string name="location">Location</string>
+    <string name="admin">Admin</string>
+    <string name="logout">Logout</string>
+
+    <string name="margajaya">Margajaya</string>
+    <string name="alamat_marga">Alamat Margajaya </string>
+    <string name="jam_buka">08.00 – 23.00 </string>
+
+
+</resources>
