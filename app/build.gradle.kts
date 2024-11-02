@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
     id("kotlin-parcelize")
+    id("androidx.navigation.safeargs.kotlin")
     alias(libs.plugins.hiltAndroid)
 
 
@@ -81,4 +82,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    //slider
+ /*   implementation ("com.github.denzcoskun:ImageSlideshow:0.1.2")*/
 }

@@ -5,3 +5,8 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hiltAndroid) apply false
 }
+buildscript {
+    dependencies {
+        classpath ("androidx.navigation:navigation-safe-args-gradle-plugin:2.8.3")
+    }
+}

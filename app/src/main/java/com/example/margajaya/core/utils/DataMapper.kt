@@ -1,8 +1,9 @@
 package com.example.margajaya.core.utils
 
 import com.example.margajaya.core.data.source.local.entity.LapanganEntity
+import com.example.margajaya.core.data.source.remote.response.Lapangan
 import com.example.margajaya.core.data.source.remote.response.LapanganItem
-import com.example.margajaya.core.domain.model.Lapangan
+import com.example.margajaya.core.domain.model.LapanganModel
 
 object DataMapper {
 
@@ -27,31 +28,32 @@ object DataMapper {
         }
         return lapanganList
     }
-
+    fun mapResponseToModel(lapangan: Lapangan?): LapanganModel {
+        return LapanganModel(
+            id = lapangan?.id ?: "",
+            harga = lapangan?.harga ?: 0,
+            jenisLapangan = lapangan?.jenisLapangan?.jenisLapangan ?: "",
+            jamMulai = lapangan?.sesiLapangan?.jamMulai ?: "",
+            jamBerakhir = lapangan?.sesiLapangan?.jamBerakhir ?: "",
+            available = lapangan?.available ?: false,
+            imageUrls = lapangan?.jenisLapangan?.image?.mapNotNull { it?.imageUrl } ?: emptyList(),
+            deskripsi = lapangan?.jenisLapangan?.deskripsi
+        )
+    }
     // Mengonversi dari List<LapanganEntity> (database) ke List<Lapangan> (domain model)
-    fun mapEntitiesToDomain(input: List<LapanganEntity>): List<Lapangan> =
+    fun mapEntitiesToDomain(input: List<LapanganEntity>): List<LapanganModel> =
         input.map { entity ->
-            Lapangan(
+            LapanganModel(
                 id = entity.id,
                 harga = entity.harga,
                 jenisLapangan = entity.jenisLapangan,
                 jamMulai = entity.jamMulai,
                 jamBerakhir = entity.jamBerakhir,
                 available = entity.available,
-                imageUrls = entity.imageUrls
+                imageUrls = entity.imageUrls,
+
             )
         }
 
-    // Mengonversi dari Lapangan (domain model) ke LapanganEntity (untuk database)
-    fun mapDomainToEntity(input: Lapangan) = LapanganEntity(
-        id = input.id,
-        harga = input.harga,
-        jenisLapangan = input.jenisLapangan,
-        jamMulai = input.jamMulai,
-        jamBerakhir = input.jamBerakhir,
-        available = input.available,
-        imageUrls = input.imageUrls,
-        createdAt = null, // Optional: bisa diisi dengan nilai default jika diperlukan
-        updatedAt = null  // Optional: bisa diisi dengan nilai default jika diperlukan
-    )
+
 }

@@ -12,104 +12,109 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.margajaya.R
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
+
 import java.util.Locale
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var lapanganAdapter: AdapterHome
     private var pickerDate: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        binding.topBar.setOnMenuItemClickListener {
-            when (it.itemId) {
+        setupTopBar()
+        setupRecyclerView()
+        observeLapanganData()
+        setupDatePickerButton()
+        return binding.root
+    }
+
+    private fun setupTopBar() {
+        binding.topBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
                 R.id.logout -> {
-                   handleLogout()
+                    handleLogout()
                     true
                 }
-
                 R.id.location -> {
                     openGoogleMapsWithLink("https://maps.app.goo.gl/1fkt4sGrzVpF2uQR7")
                     true
                 }
-
                 R.id.admin -> {
-                  handleAdminAction()
+                    handleAdminAction()
                     true
                 }
-
                 else -> false
-            }
-        }
-        binding.btnDate.setOnClickListener {
-            getDatePicker()
-        }
-
-        setupRecyclerView()
-        observeLapanganData()
-
-        return binding.root
-    }
-
-    private fun observeLapanganData() {
-        viewModel.lapangan.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    Log.d("HomeFragment", "Fetching lapangan data...")
-                }
-                is Resource.Success -> {
-                    // Update adapter dengan data baru
-                    binding.progressBar.visibility = View.GONE
-                    lapanganAdapter.submitList(resource.data)
-                }
-                is Resource.Error -> {
-                    // Tampilkan pesan error jika ada
-                    binding.progressBar.visibility = View.GONE
-                    Log.e("HomeFragment", "Error fetching lapangan data: ${resource.message}")
-                    Toast.makeText(requireContext(), "Error: ${resource.message}", Toast.LENGTH_SHORT).show()
-                }
             }
         }
     }
 
     private fun setupRecyclerView() {
         binding.rvHomefrag.layoutManager = LinearLayoutManager(requireContext())
-
-        // Inisialisasi adapter dengan data awal kosong
         lapanganAdapter = AdapterHome { lapangan ->
-            // Aksi ketika item diklik, misalnya membuka detail lapangan
+            navigateToDetailFragment(lapangan.id,pickerDate?:"")
             Toast.makeText(requireContext(), "Detail ${lapangan.jenisLapangan}", Toast.LENGTH_SHORT).show()
         }
-
         binding.rvHomefrag.adapter = lapanganAdapter
     }
 
-    private fun getDatePicker() {
+    private fun observeLapanganData() {
+        viewModel.lapangan.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> showLoadingIndicator()
+                is Resource.Success -> {
+                    hideLoadingIndicator()
+                    lapanganAdapter.submitList(resource.data)
+                }
+                is Resource.Error -> {
+                    hideLoadingIndicator()
+                    showError(resource.message)
+                }
+            }
+        }
+    }
+
+    private fun showLoadingIndicator() {
+        binding.progressBar.visibility = View.VISIBLE
+        Log.d("HomeFragment", "Fetching lapangan data...")
+    }
+
+    private fun hideLoadingIndicator() {
+        binding.progressBar.visibility = View.GONE
+    }
+
+    private fun showError(message: String?) {
+        Log.e("HomeFragment", "Error fetching lapangan data: $message")
+        Toast.makeText(requireContext(), "Error: $message", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setupDatePickerButton() {
+        binding.btnDate.setOnClickListener { showDatePicker() }
+    }
+
+    private fun showDatePicker() {
         val calendar = Calendar.getInstance()
         val datePickerDialog = DatePickerDialog(
-            requireContext(), { _, year: Int, month: Int, dayOfMonth: Int ->
-                val selectedData = Calendar.getInstance()
-                selectedData.set(year, month, dayOfMonth)
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // Ganti format jika perlu
-                pickerDate = dateFormat.format(selectedData.time)
-
-                // Panggil fungsi untuk mendapatkan data lapangan berdasarkan tanggal yang dipilih
-                if (pickerDate != null) {
-                    viewModel.fetchLapanganData(pickerDate!!) // Fetch data menggunakan ViewModel
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                val selectedDate = Calendar.getInstance().apply {
+                    set(year, month, dayOfMonth)
                 }
+                pickerDate = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault()).format(selectedDate.time)
+                viewModel.fetchLapanganData(pickerDate!!) // Fetch data dengan tanggal yang dipilih
+                Toast.makeText(requireContext(), "Tanggal terpilih: $pickerDate", Toast.LENGTH_SHORT).show()
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -117,10 +122,14 @@ class HomeFragment : Fragment() {
         )
         datePickerDialog.show()
     }
+
+    private fun navigateToDetailFragment(id: String, tanggal: String) {
+        val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(id, tanggal)
+        findNavController().navigate(action)
+    }
     private fun openGoogleMapsWithLink(link: String) {
         val gmmIntentUri = Uri.parse(link)
         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-
         if (mapIntent.resolveActivity(requireActivity().packageManager) != null) {
             startActivity(mapIntent)
         } else {
@@ -129,12 +138,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleLogout() {
-        // Tambahkan logika untuk logout
         Toast.makeText(requireContext(), "Logout clicked", Toast.LENGTH_SHORT).show()
     }
 
     private fun handleAdminAction() {
-        // Tambahkan logika untuk membuka layar admin atau aksi admin lainnya
         Toast.makeText(requireContext(), "Admin clicked", Toast.LENGTH_SHORT).show()
     }
 }

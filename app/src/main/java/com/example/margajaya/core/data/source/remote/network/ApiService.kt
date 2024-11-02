@@ -1,5 +1,6 @@
 package com.example.margajaya.core.data.source.remote.network
 
+import com.example.margajaya.core.data.source.remote.response.GetLapByIdResponse
 import com.example.margajaya.core.data.source.remote.response.GetLapResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -11,12 +12,13 @@ interface ApiService {
     suspend fun getLapangan(
         @Query("tanggal") tanggal : String
     ): GetLapResponse
-/*
+
     @GET("lapangan/{id}")
     suspend fun getLapById(
         @Path("id") id : String,
         @Query("tanggal") tanggal: String
-    ):GetLapByIdResponse*/
+    ): GetLapByIdResponse
+
     /*  @POST("auth/register")
       suspend fun register(
           @Body postModel: RegisterModel

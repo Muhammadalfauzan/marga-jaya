@@ -9,7 +9,11 @@
         android:id="@+id/homeFragment"
         android:name="com.example.margajaya.ui.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/historyFragment"
         android:name="com.example.margajaya.ui.history.HistoryFragment"
@@ -20,4 +24,17 @@
         android:name="com.example.margajaya.ui.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.example.margajaya.ui.detail.DetailFragment"
+        android:label="fragment_detail"
+        tools:layout="@layout/fragment_detail" >
+
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <argument
+            android:name="tanggal"
+            app:argType="string" />
+    </fragment>
 </navigation>

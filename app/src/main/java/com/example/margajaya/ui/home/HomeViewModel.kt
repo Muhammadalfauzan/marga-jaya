@@ -3,29 +3,34 @@ package com.example.margajaya.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+
 import androidx.lifecycle.viewModelScope
 import com.example.margajaya.core.data.Resource
-import com.example.margajaya.core.domain.model.Lapangan
+import com.example.margajaya.core.domain.model.LapanganModel
 import com.example.margajaya.core.domain.usecase.LapanganUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val lapanganUseCase: LapanganUseCase
 ) : ViewModel() {
-    // Langsung mengonversi Flow menjadi LiveData
-  //  val lapangan = lapanganUseCase.getLapangan("2024-10-31").asLiveData()
 
-    private val _lapangan = MutableLiveData<Resource<List<Lapangan>>>()
-    val lapangan: LiveData<Resource<List<Lapangan>>> get() = _lapangan
+
+    private val _lapangan = MutableLiveData<Resource<List<LapanganModel>>>()
+    val lapangan: LiveData<Resource<List<LapanganModel>>> get() = _lapangan
 
     init {
-        // Fetch data saat ViewModel dibuat
-        fetchLapanganData("2024-10-31") // Atau gunakan tanggal default yang kamu inginkan
+        fetchLapanganData(getCurrentDate()) // Fetch data dengan tanggal saat ini saat ViewModel dibuat
     }
 
+    private fun getCurrentDate(): String {
+        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    }
     fun fetchLapanganData(tanggal: String) {
         viewModelScope.launch {
             lapanganUseCase.getLapangan(tanggal).collect { resource ->
@@ -34,3 +39,5 @@ class HomeViewModel @Inject constructor(
         }
     }
 }
+// Langsung mengonversi Flow menjadi LiveData
+//val lapangan = lapanganUseCase.getLapangan("2024-10-31").asLiveData()

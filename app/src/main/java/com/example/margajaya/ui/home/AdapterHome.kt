@@ -8,12 +8,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.margajaya.R
-import com.example.margajaya.core.domain.model.Lapangan
+import com.example.margajaya.core.domain.model.LapanganModel
 import com.example.margajaya.databinding.ItemHomeBinding
 
 class AdapterHome(
-    private val onItemClick: (Lapangan) -> Unit // Fungsi untuk menangani klik item
-) : ListAdapter<Lapangan, AdapterHome.LapanganViewHolder>(DIFF_CALLBACK) {
+    private val onItemClick: (LapanganModel) -> Unit // Fungsi untuk menangani klik item
+) : ListAdapter<LapanganModel, AdapterHome.LapanganViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LapanganViewHolder {
         val binding = ItemHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -28,7 +28,7 @@ class AdapterHome(
     inner class LapanganViewHolder(private val binding: ItemHomeBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(lapangan: Lapangan) {
+        fun bind(lapangan: LapanganModel) {
             // Misalnya, memuat gambar menggunakan Glide
             Glide.with(itemView.context)
                 .load(lapangan.imageUrls.firstOrNull()) // Mengambil URL gambar pertama
@@ -49,12 +49,12 @@ class AdapterHome(
     }
 
     companion object {
-        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Lapangan>() {
-            override fun areItemsTheSame(oldItem: Lapangan, newItem: Lapangan): Boolean {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<LapanganModel>() {
+            override fun areItemsTheSame(oldItem: LapanganModel, newItem: LapanganModel): Boolean {
                 return oldItem.id == newItem.id // Pastikan ID unik
             }
 
-            override fun areContentsTheSame(oldItem: Lapangan, newItem: Lapangan): Boolean {
+            override fun areContentsTheSame(oldItem: LapanganModel, newItem: LapanganModel): Boolean {
                 return oldItem == newItem // Bandingkan semua properti
             }
         }
