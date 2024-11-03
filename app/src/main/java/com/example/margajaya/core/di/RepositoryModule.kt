@@ -1,6 +1,8 @@
 package com.example.margajaya.core.di
 
+import com.example.margajaya.core.data.AuthRepositoryImpl
 import com.example.margajaya.core.data.LapanganRepositoryImpl
+import com.example.margajaya.core.domain.repository.AuthRepository
 import com.example.margajaya.core.domain.repository.LapanganRepository
 import dagger.Binds
 import dagger.Module
@@ -14,4 +16,8 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindLapanganRepository(lapanganRepositoryImpl: LapanganRepositoryImpl): LapanganRepository
+
+    // Bind AuthRepository interface to AuthRepositoryImpl
+    @Binds
+    abstract fun bindAuthRepository(authRepositoryImpl: AuthRepositoryImpl): AuthRepository
 }

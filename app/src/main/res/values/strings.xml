@@ -14,5 +14,20 @@
     <string name="alamat_marga">Alamat Margajaya </string>
     <string name="jam_buka">08.00 – 23.00 </string>
 
+    <string name="login_title">SignIn</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="telephone">Telephone</string>
+    <string name="username">Username</string>
+    <string name="confirm_pass">Confirm Password</string>
+    <string name="register_title">SignUp</string>
 
+    <string name="rating_marga">4.4</string>
+    <string name="jam_marga">08:00 - 23:00 WIB</string>
+
+    <string name="histori">History</string>
+    <string name="profil">Profile</string>
+    <string name="role">Role</string>
+    <string name="nb">*Jika ketika hari pesan/sewa tidak bisa datang,bisa merubah jadwal sewa pada h-1 sebelum hari sewa.</string>
+    <string name="nb2">*Perubahan jadwal tersebut akan dilayani oleh Admin melalui whatsapp yang tertera pada menu pojok kiri atas .</string>
 </resources>

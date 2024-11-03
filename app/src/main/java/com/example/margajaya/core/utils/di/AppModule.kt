@@ -1,5 +1,8 @@
 package com.example.margajaya.core.utils.di
 
+import com.example.margajaya.core.data.AuthRepositoryImpl
+import com.example.margajaya.core.domain.usecase.AuthInteractor
+import com.example.margajaya.core.domain.usecase.AuthUseCase
 import com.example.margajaya.core.domain.usecase.LapanganInteractor
 import com.example.margajaya.core.domain.usecase.LapanganUseCase
 import dagger.Binds
@@ -15,4 +18,10 @@ abstract class AppModule {
     @Binds
     @ViewModelScoped
     abstract fun provideLapanganUseCase(lapanganInteractor: LapanganInteractor): LapanganUseCase
+
+    @Binds
+    @ViewModelScoped
+    abstract fun provideAuthUseCase(authInteractor: AuthInteractor): AuthUseCase
 }
+
+
