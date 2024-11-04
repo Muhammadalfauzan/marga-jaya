@@ -5,25 +5,26 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.margajaya.core.data.Resource
-import com.example.margajaya.core.domain.model.RegisterModel
+import com.example.margajaya.core.data.source.remote.response.LoginResponse
+import com.example.margajaya.core.domain.model.LoginModel
 import com.example.margajaya.core.domain.usecase.AuthUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
 @HiltViewModel
-class RegisterViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     private val authUseCase: AuthUseCase
 ) : ViewModel() {
 
-    private val _registerResult = MutableLiveData<Resource<Unit>>()
-    val registerResult: LiveData<Resource<Unit>> get() = _registerResult
+    private val _loginResult = MutableLiveData<Resource<LoginResponse>>()
+    val loginResult: LiveData<Resource<LoginResponse>> = _loginResult
 
-    fun registerUser(registerModel: RegisterModel) {
+    fun loginUser(loginModel: LoginModel) {
         viewModelScope.launch {
-            _registerResult.postValue(Resource.Loading())
-            val result = authUseCase.registerUser(registerModel)
-            _registerResult.postValue(result)
+            _loginResult.value = Resource.Loading()
+            _loginResult.value = authUseCase.loginUser(loginModel)
         }
     }
 }

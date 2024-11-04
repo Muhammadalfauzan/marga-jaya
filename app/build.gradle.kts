@@ -82,7 +82,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-
+    implementation ("androidx.security:security-crypto:1.1.0-alpha06")
     //slider
  /*   implementation ("com.github.denzcoskun:ImageSlideshow:0.1.2")*/
 }

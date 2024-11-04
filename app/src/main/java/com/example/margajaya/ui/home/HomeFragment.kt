@@ -14,13 +14,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.margajaya.AutentikasiActivity
 import com.example.margajaya.R
 import com.example.margajaya.core.data.Resource
+import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
 import com.example.margajaya.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 
 import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -28,7 +31,8 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var lapanganAdapter: AdapterHome
     private var pickerDate: String? = null
-
+    @Inject
+    lateinit var authPreferences: AuthPreferences
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -138,7 +142,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleLogout() {
-        Toast.makeText(requireContext(), "Logout clicked", Toast.LENGTH_SHORT).show()
+        authPreferences.clearUserData()
+        Toast.makeText(requireContext(), "Logout berhasil", Toast.LENGTH_SHORT).show()
+        val intent = Intent(requireContext(), AutentikasiActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 
     private fun handleAdminAction() {

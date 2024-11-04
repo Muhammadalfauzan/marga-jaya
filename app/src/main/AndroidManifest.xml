@@ -18,7 +18,7 @@
         android:theme="@style/Theme.Margajaya"
         tools:targetApi="31">
         <activity
-            android:name=".AutentikasiActivity"
+            android:name=".SplashActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,13 +27,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.map.LocationActivity"
-            android:exported="false" />
+            android:name=".AutentikasiActivity"
+            android:exported="false">
+
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="false">
 
         </activity>
+        <activity
+            android:name=".ui.map.LocationActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
