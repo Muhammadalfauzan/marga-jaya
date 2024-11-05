@@ -1,5 +1,7 @@
 package com.example.margajaya.ui.detail
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,6 +15,7 @@ import com.bumptech.glide.Glide
 import com.example.margajaya.R
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.core.domain.model.LapanganModel
+import com.example.margajaya.core.domain.model.PaymentModel
 import com.example.margajaya.databinding.FragmentDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
@@ -25,6 +28,7 @@ class DetailFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val detailViewModel: DetailViewModel by viewModels()
+    private val paymentViewModel : PaymentViewModel by viewModels()
     private val args: DetailFragmentArgs by navArgs() // Use navArgs to get arguments
 
     override fun onCreateView(
@@ -40,6 +44,8 @@ class DetailFragment : Fragment() {
 
         observeLapanganData(lapanganId, tanggal) // Observe the data from ViewModel
         binding.tglDetailfrag.text = tanggal
+        setupBookingButton(lapanganId, tanggal)
+        observePaymentResult()
         return binding.root
     }
 
@@ -70,7 +76,37 @@ class DetailFragment : Fragment() {
             }
         }
     }
+    private fun setupBookingButton(idLapang: String, dateByStatus: String) {
+        binding.btnPesan.setOnClickListener {
+            val paymentModel = PaymentModel(id_lapangan = idLapang, tanggal = dateByStatus)
+            paymentViewModel.processPayment(paymentModel) // Call processPayment
+        }
+    }
 
+    private fun observePaymentResult() {
+        paymentViewModel.paymentResult.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Resource.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+                is Resource.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    result.data?.data?.redirectUrl?.let { url ->
+                        intentMidtrans(url)
+                    }
+                    Toast.makeText(requireContext(), "Berhasil melakukan booking lapangan", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(requireContext(), result.message ?: "Gagal dalam melakukan booking lapangan", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    private fun intentMidtrans(redirectUrl: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(redirectUrl))
+        startActivity(intent)
+    }
     // Update UI with lapangan data
     private fun updateUI(lapangan: LapanganModel) {
         binding.apply {

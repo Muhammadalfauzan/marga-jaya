@@ -3,8 +3,10 @@ package com.example.margajaya.core.data.source.remote.network
 import com.example.margajaya.core.data.source.remote.response.GetLapByIdResponse
 import com.example.margajaya.core.data.source.remote.response.GetLapResponse
 import com.example.margajaya.core.data.source.remote.response.LoginResponse
+import com.example.margajaya.core.data.source.remote.response.PaymentResponse
 import com.example.margajaya.core.data.source.remote.response.RegisterResponse
 import com.example.margajaya.core.domain.model.LoginModel
+import com.example.margajaya.core.domain.model.PaymentModel
 import com.example.margajaya.core.domain.model.RegisterModel
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -38,6 +40,13 @@ interface ApiService {
            @Body postModel: LoginModel
        ): LoginResponse
 
+    @POST("bookings")
+    suspend fun payment(
+        @Body postModel : PaymentModel
+    ): PaymentResponse
+
+   /* @GET("users/bookings")
+    suspend fun getAllBooking():BookingResponse*/
     /*
           @GET("auth/users/me")
           suspend fun getProfile() : ProfileResponse*/
@@ -47,12 +56,7 @@ interface ApiService {
 /*
 
 
-    @POST("bookings")
-    suspend fun payment(
-        @Body postModel : PaymetModel
-    ):PaymentResponse
 
-    @GET("users/bookings")
-    suspend fun getAllHistory():HistoryResponse*/
+    */
 
 }

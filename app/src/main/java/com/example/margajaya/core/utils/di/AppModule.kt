@@ -7,6 +7,8 @@ import com.example.margajaya.core.domain.usecase.AuthInteractor
 import com.example.margajaya.core.domain.usecase.AuthUseCase
 import com.example.margajaya.core.domain.usecase.LapanganInteractor
 import com.example.margajaya.core.domain.usecase.LapanganUseCase
+import com.example.margajaya.core.domain.usecase.PaymentInteractor
+import com.example.margajaya.core.domain.usecase.PaymentUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,6 +30,9 @@ abstract class AppModule {
     @ViewModelScoped
     abstract fun provideAuthUseCase(authInteractor: AuthInteractor): AuthUseCase
 
+    @Binds
+    @ViewModelScoped
+    abstract fun providePaymentUseCase(paymentInteractor: PaymentInteractor): PaymentUseCase
 }
 
 

@@ -3,17 +3,14 @@ package com.example.margajaya
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
-class SplashActivity : AppCompatActivity() {
-
+class SplashAcitivty : AppCompatActivity() {
     @Inject
     lateinit var authPreferences: AuthPreferences
 
@@ -29,7 +26,7 @@ class SplashActivity : AppCompatActivity() {
                 // Arahkan ke AutentikasiActivity jika belum login
                 startActivity(Intent(this, AutentikasiActivity::class.java))
             }
-            finish() // Tutup SplashActivity setelah navigasi})
+            finish()
         },3000)
     }
 
