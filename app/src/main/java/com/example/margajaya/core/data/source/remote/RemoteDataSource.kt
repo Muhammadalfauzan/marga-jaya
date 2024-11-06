@@ -3,6 +3,9 @@ package com.example.margajaya.core.data.source.remote
 import android.util.Log
 import com.example.margajaya.core.data.source.remote.network.ApiResponse
 import com.example.margajaya.core.data.source.remote.network.ApiService
+import com.example.margajaya.core.data.source.remote.response.Booking
+import com.example.margajaya.core.data.source.remote.response.BookingItem
+import com.example.margajaya.core.data.source.remote.response.BookingResponse
 import com.example.margajaya.core.data.source.remote.response.Lapangan
 import com.example.margajaya.core.data.source.remote.response.LapanganItem
 import kotlinx.coroutines.Dispatchers
@@ -54,4 +57,17 @@ class RemoteDataSource @Inject constructor(private val apiService: ApiService) {
             Log.e("RemoteDataSource", e.toString())
         }.flowOn(Dispatchers.IO)
     }
+
+    suspend fun getAllBooking(): Flow<ApiResponse<BookingResponse>> = flow {
+        val response = apiService.getAllBooking()
+        if (response.success == true && response.data != null) {
+            emit(ApiResponse.Success(response))
+        } else {
+            emit(ApiResponse.Empty)
+        }
+    }.catch { e ->
+        emit(ApiResponse.Error(e.toString()))
+        Log.e("RemoteDataSource", "Error occurred: ${e.localizedMessage}")
+    }.flowOn(Dispatchers.IO)
+
 }

@@ -1,5 +1,6 @@
 package com.example.margajaya.ui.autentikasi
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -84,11 +85,10 @@ class LoginFragment : Fragment() {
                     Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                     Log.d("LoginFragment", "Login successful, navigating to home")
 
-                    (activity as? AutentikasiActivity)?.apply {
-                        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_auth) as NavHostFragment
-                        val navController = navHostFragment.navController
-                        navController.setGraph(R.navigation.mobile_navigation)
-                    }
+                    // Pindah ke MainActivity setelah login berhasil
+                    val intent = Intent(requireContext(), MainActivity::class.java)
+                    startActivity(intent)
+                    requireActivity().finish()
                 }
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE

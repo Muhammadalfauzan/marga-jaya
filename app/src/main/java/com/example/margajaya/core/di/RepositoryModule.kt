@@ -1,9 +1,11 @@
 package com.example.margajaya.core.di
 
 import com.example.margajaya.core.data.AuthRepositoryImpl
+import com.example.margajaya.core.data.BookingRepositoryImpl
 import com.example.margajaya.core.data.LapanganRepositoryImpl
 import com.example.margajaya.core.data.PaymentRepositoryImpl
 import com.example.margajaya.core.domain.repository.AuthRepository
+import com.example.margajaya.core.domain.repository.BookingRepository
 import com.example.margajaya.core.domain.repository.LapanganRepository
 import com.example.margajaya.core.domain.repository.PaymentRepository
 import dagger.Binds
@@ -25,4 +27,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPaymentRepository(paymentRepositoryImpl: PaymentRepositoryImpl): PaymentRepository
+
+    @Binds
+    abstract fun bindBookingRepository(bookingRepositoryImpl: BookingRepositoryImpl): BookingRepository
 }

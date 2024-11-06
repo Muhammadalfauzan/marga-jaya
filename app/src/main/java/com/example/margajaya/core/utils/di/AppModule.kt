@@ -5,6 +5,8 @@ import com.example.margajaya.core.data.AuthRepositoryImpl
 import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
 import com.example.margajaya.core.domain.usecase.AuthInteractor
 import com.example.margajaya.core.domain.usecase.AuthUseCase
+import com.example.margajaya.core.domain.usecase.BookingInteractor
+import com.example.margajaya.core.domain.usecase.BookingUseCase
 import com.example.margajaya.core.domain.usecase.LapanganInteractor
 import com.example.margajaya.core.domain.usecase.LapanganUseCase
 import com.example.margajaya.core.domain.usecase.PaymentInteractor
@@ -32,7 +34,14 @@ abstract class AppModule {
 
     @Binds
     @ViewModelScoped
+    abstract fun provideBookingUseCase(bookingInteractor: BookingInteractor): BookingUseCase
+
+    @Binds
+    @ViewModelScoped
     abstract fun providePaymentUseCase(paymentInteractor: PaymentInteractor): PaymentUseCase
+
+
+
 }
 
 
