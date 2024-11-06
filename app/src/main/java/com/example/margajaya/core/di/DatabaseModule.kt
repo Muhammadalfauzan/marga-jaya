@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.example.margajaya.core.data.source.local.room.LapanganDao
 import com.example.margajaya.core.data.source.local.room.LapanganDatabase
+import com.example.margajaya.core.data.source.local.room.UserDao
+import com.example.margajaya.core.data.source.local.room.UserDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,13 +17,27 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
 
+    // Provider untuk LapanganDatabase
     @Singleton
     @Provides
-    fun provideDatabase(@ApplicationContext context: Context): LapanganDatabase = Room.databaseBuilder(
-        context,
-        LapanganDatabase::class.java, "Lapangan.db"
-    ).fallbackToDestructiveMigration().build()
+    fun provideLapanganDatabase(@ApplicationContext context: Context): LapanganDatabase =
+        Room.databaseBuilder(
+            context,
+            LapanganDatabase::class.java, "Lapangan.db"
+        ).fallbackToDestructiveMigration().build()
 
     @Provides
-    fun provideTourismDao(database: LapanganDatabase): LapanganDao = database.lapDao()
+    fun provideLapanganDao(database: LapanganDatabase): LapanganDao = database.lapDao()
+
+    // Provider untuk ProfileDatabase
+    @Singleton
+    @Provides
+    fun provideProfileDatabase(@ApplicationContext context: Context): UserDatabase =
+        Room.databaseBuilder(
+            context,
+            UserDatabase::class.java, "Profile.db"
+        ).fallbackToDestructiveMigration().build()
+
+    @Provides
+    fun provideProfileDao(database: UserDatabase): UserDao = database.userDao()
 }

@@ -1,14 +1,17 @@
 package com.example.margajaya.core.utils
 
 import com.example.margajaya.core.data.source.local.entity.LapanganEntity
+import com.example.margajaya.core.data.source.local.entity.UserProfileEntity
 import com.example.margajaya.core.data.source.remote.response.Booking
 import com.example.margajaya.core.data.source.remote.response.BookingItem
 import com.example.margajaya.core.data.source.remote.response.BookingResponse
 import com.example.margajaya.core.data.source.remote.response.Lapangan
 import com.example.margajaya.core.data.source.remote.response.LapanganItem
+import com.example.margajaya.core.data.source.remote.response.ProfileResponse
 import com.example.margajaya.core.domain.model.BookingDataModel
 import com.example.margajaya.core.domain.model.BookingItemModel
 import com.example.margajaya.core.domain.model.LapanganModel
+import com.example.margajaya.core.domain.model.ProfileModel
 
 object DataMapper {
 
@@ -144,4 +147,27 @@ object DataMapper {
             )
         }
     }
+
+
+        fun entityToModel(entity: UserProfileEntity?): ProfileModel {
+            return ProfileModel(
+                id = entity?.id ?: "",
+                name = entity?.name ?: "",
+                email = entity?.email ?: "",
+                role = entity?.role ?: "",
+                noTelp = entity?.noTelp ?: ""
+            )
+        }
+
+        fun responseToEntity(response: ProfileResponse): UserProfileEntity? {
+            return response.data?.user?.let {
+                UserProfileEntity(
+                    id = it.id ?: "",
+                    name = it.name ?: "",
+                    email = it.email ?: "",
+                    role = it.role ?: "",
+                    noTelp = it.noTelp ?: ""
+                )
+            }
+        }
 }

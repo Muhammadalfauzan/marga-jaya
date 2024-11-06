@@ -11,6 +11,8 @@ import com.example.margajaya.core.domain.usecase.LapanganInteractor
 import com.example.margajaya.core.domain.usecase.LapanganUseCase
 import com.example.margajaya.core.domain.usecase.PaymentInteractor
 import com.example.margajaya.core.domain.usecase.PaymentUseCase
+import com.example.margajaya.core.domain.usecase.UserInteractor
+import com.example.margajaya.core.domain.usecase.UserUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -40,7 +42,9 @@ abstract class AppModule {
     @ViewModelScoped
     abstract fun providePaymentUseCase(paymentInteractor: PaymentInteractor): PaymentUseCase
 
-
+    @Binds
+    @ViewModelScoped
+    abstract fun provideUserUseCase(userInteractor: UserInteractor): UserUseCase
 
 }
 

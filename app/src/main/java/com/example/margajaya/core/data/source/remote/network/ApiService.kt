@@ -5,6 +5,7 @@ import com.example.margajaya.core.data.source.remote.response.GetLapByIdResponse
 import com.example.margajaya.core.data.source.remote.response.GetLapResponse
 import com.example.margajaya.core.data.source.remote.response.LoginResponse
 import com.example.margajaya.core.data.source.remote.response.PaymentResponse
+import com.example.margajaya.core.data.source.remote.response.ProfileResponse
 import com.example.margajaya.core.data.source.remote.response.RegisterResponse
 import com.example.margajaya.core.domain.model.LoginModel
 import com.example.margajaya.core.domain.model.PaymentModel
@@ -48,9 +49,11 @@ interface ApiService {
 
     @GET("users/bookings")
     suspend fun getAllBooking(): BookingResponse
+
+    @GET("auth/users/me")
+    suspend fun getProfile() : ProfileResponse
     /*
-          @GET("auth/users/me")
-          suspend fun getProfile() : ProfileResponse*/
+         */
 
 
 

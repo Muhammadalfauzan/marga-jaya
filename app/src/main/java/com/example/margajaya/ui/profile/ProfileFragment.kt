@@ -1,62 +1,80 @@
 package com.example.margajaya.ui.profile
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.viewModels
 import com.example.margajaya.R
+import com.example.margajaya.core.data.Resource
+import com.example.margajaya.databinding.FragmentProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ProfileFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding!!
+
+    private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+    ): View {
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ProfileFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ProfileFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        observeUserProfile()
+    }
+
+    private fun observeUserProfile() {
+        userViewModel.getUserProfile().observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    // Tampilkan loading indicator
+                    binding.progressBar.visibility = View.VISIBLE
+                    Log.d("ProfileFragment", "Loading profile data...")
+                }
+                is Resource.Success -> {
+                    // Sembunyikan loading indicator
+                    binding.progressBar.visibility = View.GONE
+                    val profile = resource.data
+                    if (profile != null) {
+                        // Update UI dengan data profile
+                        binding.nameProfile.text = profile.name
+                        binding.emailProfile.text = profile.email
+                        binding.telpProfile.text = profile.noTelp
+                        Log.d("ProfileFragment", "Profile data fetched successfully: $profile")
+                    }
+                }
+                is Resource.Error -> {
+                    // Sembunyikan loading indicator dan tampilkan pesan error
+                    binding.progressBar.visibility = View.GONE
+                    Log.e("ProfileFragment", "Error fetching profile: ${resource.message}")
+                    Toast.makeText(
+                        context,
+                        resource.message ?: "Error fetching profile",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
+
+
+

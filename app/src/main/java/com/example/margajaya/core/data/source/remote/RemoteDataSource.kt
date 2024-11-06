@@ -8,6 +8,7 @@ import com.example.margajaya.core.data.source.remote.response.BookingItem
 import com.example.margajaya.core.data.source.remote.response.BookingResponse
 import com.example.margajaya.core.data.source.remote.response.Lapangan
 import com.example.margajaya.core.data.source.remote.response.LapanganItem
+import com.example.margajaya.core.data.source.remote.response.ProfileResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -68,6 +69,22 @@ class RemoteDataSource @Inject constructor(private val apiService: ApiService) {
     }.catch { e ->
         emit(ApiResponse.Error(e.toString()))
         Log.e("RemoteDataSource", "Error occurred: ${e.localizedMessage}")
+    }.flowOn(Dispatchers.IO)
+
+
+    suspend fun getProfile(): Flow<ApiResponse<ProfileResponse>> = flow {
+        try {
+            val response = apiService.getProfile()
+            if (response.success == true && response.data != null) {
+                Log.d("RemoteDataSource", "Profile data from API: ${response.data}")
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Empty)
+            }
+        } catch (e: Exception) {
+            Log.e("RemoteDataSource", "Error fetching profile: ${e.localizedMessage}")
+            emit(ApiResponse.Error(e.localizedMessage ?: "An error occurred"))
+        }
     }.flowOn(Dispatchers.IO)
 
 }
