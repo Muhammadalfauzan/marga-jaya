@@ -7,7 +7,7 @@ import com.example.margajaya.core.domain.model.UpdateUserModel
 import kotlinx.coroutines.flow.Flow
 
 interface UserUseCase {
-    fun getProfile(): Flow<Resource<ProfileModel>>
+    fun getProfile(forceFetch: Boolean = false): Flow<Resource<ProfileModel>>
 
     suspend fun updateUser(updateUserModel: UpdateUserModel): Resource<UpdateUserResponse>
     suspend fun clearProfileCache()

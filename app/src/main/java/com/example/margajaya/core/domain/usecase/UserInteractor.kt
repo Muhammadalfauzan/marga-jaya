@@ -12,7 +12,8 @@ class UserInteractor @Inject constructor(
     private val profileRepository: UserRepository
 ) : UserUseCase {
 
-    override fun getProfile(): Flow<Resource<ProfileModel>> {
+
+    override fun getProfile(forceFetch: Boolean): Flow<Resource<ProfileModel>> {
         return profileRepository.getProfile()
     }
 

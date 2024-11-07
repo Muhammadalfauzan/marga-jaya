@@ -6,6 +6,7 @@
         <item name="colorSecondary">@color/second</item>
         <item name="colorPrimaryVariant">@color/black</item>
         <item name="actionOverflowButtonStyle">@style/ThreeDotMenu</item>
+        <item name="android:windowBackground">@color/white</item>
     </style>
 
     <style name="Theme.Margajaya" parent="Base.Theme.Margajaya" />

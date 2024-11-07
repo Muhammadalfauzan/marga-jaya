@@ -11,8 +11,7 @@ import com.example.margajaya.core.domain.model.ProfileModel
 import com.example.margajaya.core.domain.model.UpdateUserModel
 import com.example.margajaya.core.domain.usecase.UserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onEach
+
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,12 +21,13 @@ class UserViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Fungsi untuk mendapatkan data profil
-    fun getUserProfile(): LiveData<Resource<ProfileModel>> {
-        return userUseCase.getProfile().asLiveData()
+    fun getUserProfile(forceFetch: Boolean = false): LiveData<Resource<ProfileModel>> {
+        return userUseCase.getProfile(forceFetch).asLiveData()
     }
     fun clearProfileCache() {
         viewModelScope.launch {
             userUseCase.clearProfileCache()
+            getUserProfile()
         }
     }
     fun updateUser(updateUserModel: UpdateUserModel): LiveData<Resource<UpdateUserResponse>> {

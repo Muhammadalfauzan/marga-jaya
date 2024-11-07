@@ -1,23 +1,29 @@
 package com.example.margajaya.ui.profile
 
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import com.example.margajaya.AutentikasiActivity
+import com.example.margajaya.MainActivity
 import com.example.margajaya.R
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
+import com.example.margajaya.core.domain.model.ProfileModel
 import com.example.margajaya.core.domain.model.UpdateUserModel
 import com.example.margajaya.databinding.FragmentProfileBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
@@ -27,10 +33,13 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val userViewModel: UserViewModel by viewModels()
-
+    private var isUserUpdated = false
+    private var originalName: String = ""
+    private var originalTelp: String = ""
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
+
     ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         return binding.root
@@ -39,8 +48,22 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpLogoutButton()
         observeUserProfile()
         setupSwipeToRefresh()
+        setupSaveButton()
+        setupTextWatchers()
+        handleKeyboardVisibility()
+        setUpToolbar()
+    }
+    private fun setUpToolbar() {
+        // Pastikan MainActivity sebagai AppCompatActivity untuk mengakses supportActionBar
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            title = "Profile" // Atur judul untuk ProfileFragment
+            show() // Pastikan Toolbar terlihat
+        }
+    }
+    private fun setUpLogoutButton(){
         binding.btnLogout.setOnClickListener {
             authPreferences.clearUserData()
             Toast.makeText(requireContext(), "Logout berhasil", Toast.LENGTH_SHORT).show()
@@ -50,94 +73,149 @@ class ProfileFragment : Fragment() {
             userViewModel.clearProfileCache()
             // Lakukan tindakan lain seperti navigasi ke layar login
         }
+    }
+    private fun observeUserProfile(forceFetch: Boolean = false) {
+        userViewModel.getUserProfile(forceFetch).observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    if (forceFetch) showLoading()
+                    Log.d("ProfileFragment", "Loading profile data...")
+                }
 
+                is Resource.Success -> {
+                    hideLoading()
+                    handleProfileSuccess(resource.data)
+                }
+
+                is Resource.Error -> {
+                    hideLoading()
+                    handleProfileError(resource.message)
+                }
+            }
+        }
+    }
+    private fun handleProfileSuccess(profile: ProfileModel?) {
+        hideLoading()
+        profile?.let {
+            binding.edUsername.setText(it.name)
+            binding.edEmail.setText(it.email)
+            binding.edEmail.isEnabled = false
+            binding.edTelp.setText(it.noTelp)
+
+            // Set original data for comparison
+            originalName = it.name ?: ""
+            originalTelp = it.noTelp ?: ""
+            checkForChanges()
+        }
+    }
+    private fun handleProfileError(message: String?) {
+        hideLoading()
+        Toast.makeText(context, message ?: "Error fetching profile", Toast.LENGTH_LONG).show()
+    }
+
+    private fun showLoading() {
+        binding.cardLoading.visibility = View.VISIBLE
+        binding.btnSave.isEnabled =false
+    }
+
+    private fun hideLoading() {
+        binding.cardLoading.visibility = View.GONE
+        binding.btnSave.isEnabled = true
+    }
+
+    private fun setupSaveButton() {
         binding.btnSave.setOnClickListener {
+            showLoading()
             updateUser()
         }
     }
     private fun setupSwipeToRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             userViewModel.clearProfileCache()
-            observeUserProfile() // Fetch ulang data
-            binding.swipeRefreshLayout.isRefreshing = false // Hentikan refresh animation setelah data selesai diambil
+            observeUserProfile(forceFetch = true)  // Fetch ulang data
+            binding.swipeRefreshLayout.isRefreshing =
+                false // Hentikan refresh animation setelah data selesai diambil
         }
     }
-    private fun observeUserProfile() {
-        userViewModel.getUserProfile().observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    // Tampilkan loading indicator
-                    binding.progressBar.visibility = View.VISIBLE
-                    Log.d("ProfileFragment", "Loading profile data...")
-                }
-                is Resource.Success -> {
-                    // Sembunyikan loading indicator
-                    binding.progressBar.visibility = View.GONE
-                    val profile = resource.data
-                    if (profile != null) {
-                        // Update UI dengan data profile
-                        binding.edUsername.setText(profile.name)
-                        binding.edEmail.setText(profile.email)
-                        binding.edEmail.isEnabled = false
-                        binding.edTelp.setText(profile.noTelp)
-                        Log.d("ProfileFragment", "Profile data fetched successfully: $profile")
-                    }
-                }
-                is Resource.Error -> {
-                    // Sembunyikan loading indicator dan tampilkan pesan error
-                    binding.progressBar.visibility = View.GONE
-                    Log.e("ProfileFragment", "Error fetching profile: ${resource.message}")
-                    Toast.makeText(
-                        context,
-                        resource.message ?: "Error fetching profile",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+    private fun setupTextWatchers() {
+        binding.edUsername.addTextChangedListener(createTextWatcher())
+        binding.edTelp.addTextChangedListener(createTextWatcher())
+        binding.edPassLama.addTextChangedListener(createTextWatcher())
+        binding.edPassBaru.addTextChangedListener(createTextWatcher())
+    }
+
+    private fun createTextWatcher(): TextWatcher {
+        return object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                checkForChanges()
             }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         }
     }
+
+    private fun checkForChanges() {
+        val isNameChanged = binding.edUsername.text.toString() != originalName
+        val isTelpChanged = binding.edTelp.text.toString() != originalTelp
+        val isPasswordChanged = !binding.edPassLama.text.isNullOrEmpty() && !binding.edPassBaru.text.isNullOrEmpty()
+
+        isUserUpdated = isNameChanged || isTelpChanged || isPasswordChanged
+        updateSaveButtonState()
+    }
+    private fun updateSaveButtonState(){
+        binding.btnSave.isEnabled = isUserUpdated
+        binding.btnSave.setBackgroundColor(
+            if (isUserUpdated) resources.getColor(R.color.primary,null)
+            else resources.getColor(R.color.second,null)
+        )
+    }
+
+
+
     private fun updateUser() {
-        val name = binding.edUsername.text.toString()
-        val noTelp = binding.edTelp.text.toString()
-        val password = binding.edPassLama.text.toString()
-        val newPassword = binding.edPassBaru.text.toString()
         val updateUserRequest = UpdateUserModel(
-            email = binding.edEmail.text.toString(), // Email tidak bisa diubah
-            name = name,
-            no_telp = noTelp,
-            password = password,
-            new_password = newPassword
+            email = binding.edEmail.text.toString(),
+            name = binding.edUsername.text.toString(),
+            no_telp = binding.edTelp.text.toString(),
+            password = binding.edPassLama.text.toString(),
+            new_password = binding.edPassBaru.text.toString()
         )
 
         userViewModel.updateUser(updateUserRequest).observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    Log.d("ProfileFragment", "Updating user data...")
-                }
-
-                is Resource.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(requireContext(), "User berhasil diupdate", Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-                is Resource.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    Log.e("ProfileFragment", "Error updating user: ${resource.message}")
-                    Toast.makeText(
-                        context,
-                        resource.message ?: "Error updating user",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                is Resource.Loading -> showLoading()
+                is Resource.Success -> handleUpdateSuccess()
+                is Resource.Error -> handleProfileError(resource.message)
             }
         }
     }
+    private fun handleUpdateSuccess() {
+        hideLoading()
+        Toast.makeText(requireContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show()
+        binding.edPassLama.text?.clear()
+        binding.edPassBaru.text?.clear()
+        checkForChanges()
+    }
+    private fun handleKeyboardVisibility() {
+        // Mendapatkan BottomNavigationView dari activity
+        val bottomNavigationView =
+            requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        // Menggunakan WindowInsets untuk memantau keyboard
+        view?.viewTreeObserver?.addOnGlobalLayoutListener {
+            val rect = Rect()
+            view?.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = view?.rootView?.height ?: 0
+            val keypadHeight = screenHeight - rect.bottom
+
+            if (keypadHeight > screenHeight * 0.15) {
+                // Keyboard sedang muncul, sembunyikan BottomNavigationView
+                bottomNavigationView.visibility = View.GONE
+            } else {
+                // Keyboard disembunyikan, tampilkan BottomNavigationView
+                bottomNavigationView.visibility = View.VISIBLE
+            }
+        }
     }
 }
 

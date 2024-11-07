@@ -35,8 +35,8 @@ class AdapterBooking(
             val tgl = bookingItem.tanggal
             val sformat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
             val inputformat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX", Locale.getDefault())
-            val date = inputformat.parse(tgl)
-            val resultDate = sformat.format(date)
+            val date = tgl?.let { inputformat.parse(it) }
+            val resultDate = date?.let { sformat.format(it) }
 
             binding.tvJenlaphistory.text = bookingItem.jenisLapangan
             binding.tvJamhistory.text = "${bookingItem.jamMulai} - ${bookingItem.jamBerakhir}"
