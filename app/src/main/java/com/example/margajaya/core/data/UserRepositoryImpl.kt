@@ -5,8 +5,11 @@ import com.example.margajaya.core.data.source.local.LocalDataSource
 import com.example.margajaya.core.data.source.local.entity.UserProfileEntity
 import com.example.margajaya.core.data.source.remote.RemoteDataSource
 import com.example.margajaya.core.data.source.remote.network.ApiResponse
+import com.example.margajaya.core.data.source.remote.network.ApiService
 import com.example.margajaya.core.data.source.remote.response.ProfileResponse
+import com.example.margajaya.core.data.source.remote.response.UpdateUserResponse
 import com.example.margajaya.core.domain.model.ProfileModel
+import com.example.margajaya.core.domain.model.UpdateUserModel
 
 import com.example.margajaya.core.domain.repository.UserRepository
 import com.example.margajaya.core.utils.AppExecutors
@@ -22,7 +25,8 @@ import javax.inject.Singleton
 class UserRepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
-    private val appExecutors: AppExecutors
+    private val appExecutors: AppExecutors,
+    private val apiService : ApiService
 ) : UserRepository {
 
     override fun getProfile(): Flow<Resource<ProfileModel>> {
@@ -70,6 +74,26 @@ class UserRepositoryImpl @Inject constructor(
                 }
             }
         }.asFlow()
+    }
+
+    override suspend fun updateUser(updateUserModel: UpdateUserModel): Resource<UpdateUserResponse> {
+        return try {
+            val response = apiService.updateUser(updateUserModel)
+            if (response.success) {
+                Resource.Success(response)
+            } else {
+                Resource.Error(response.message)
+            }
+        } catch (e: Exception) {
+            Resource.Error("An error occurred: ${e.localizedMessage}")
+        }
+    }
+
+
+    override suspend fun clearProfileCache() {
+        withContext(appExecutors.diskIO().asCoroutineDispatcher()) {
+            localDataSource.clearProfile()
+        }
     }
 }
 

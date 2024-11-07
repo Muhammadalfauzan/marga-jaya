@@ -15,16 +15,6 @@
             app:destination="@id/detailFragment" />
     </fragment>
     <fragment
-        android:id="@+id/historyFragment"
-        android:name="com.example.margajaya.ui.history.HistoryFragment"
-        android:label="fragment_history"
-        tools:layout="@layout/fragment_history" />
-    <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.example.margajaya.ui.profile.ProfileFragment"
-        android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
-    <fragment
         android:id="@+id/detailFragment"
         android:name="com.example.margajaya.ui.detail.DetailFragment"
         android:label="fragment_detail"
@@ -36,5 +26,17 @@
         <argument
             android:name="tanggal"
             app:argType="string" />
+
     </fragment>
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.margajaya.ui.history.HistoryFragment"
+        android:label="fragment_history"
+        tools:layout="@layout/fragment_history" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.margajaya.ui.profile.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+
 </navigation>

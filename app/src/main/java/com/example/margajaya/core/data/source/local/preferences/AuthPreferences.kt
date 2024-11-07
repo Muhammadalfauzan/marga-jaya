@@ -31,10 +31,6 @@ class AuthPreferences @Inject constructor(@ApplicationContext context: Context) 
         return sharedPreferences.getString("auth_token", null)
     }
 
-    fun clearAuthToken() {
-        sharedPreferences.edit().remove("auth_token").apply()
-    }
-
     // Fungsi tambahan untuk data sensitif lainnya
     fun saveEmail(email: String) {
         sharedPreferences.edit().putString("email_user", email).apply()
@@ -44,9 +40,6 @@ class AuthPreferences @Inject constructor(@ApplicationContext context: Context) 
         return sharedPreferences.getString("email_user", null)
     }
 
-    fun clearEmail() {
-        sharedPreferences.edit().remove("email_user").apply()
-    }
     fun clearUserData() {
         sharedPreferences.edit()
             .remove("auth_token")

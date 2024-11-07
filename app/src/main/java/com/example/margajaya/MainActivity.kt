@@ -27,5 +27,15 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         binding.buttomNav.setupWithNavController(navController)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.detailFragment -> { // Gantilah `detailFragment` dengan ID dari fragment detail di navigation.xml
+                    binding.buttomNav.visibility = View.GONE
+                }
+                else -> {
+                    binding.buttomNav.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 }

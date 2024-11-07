@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.margajaya.core.data.Resource
+import com.example.margajaya.core.data.source.remote.response.UpdateUserResponse
 import com.example.margajaya.core.domain.model.ProfileModel
+import com.example.margajaya.core.domain.model.UpdateUserModel
 import com.example.margajaya.core.domain.usecase.UserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
@@ -22,5 +24,21 @@ class UserViewModel @Inject constructor(
     // Fungsi untuk mendapatkan data profil
     fun getUserProfile(): LiveData<Resource<ProfileModel>> {
         return userUseCase.getProfile().asLiveData()
+    }
+    fun clearProfileCache() {
+        viewModelScope.launch {
+            userUseCase.clearProfileCache()
+        }
+    }
+    fun updateUser(updateUserModel: UpdateUserModel): LiveData<Resource<UpdateUserResponse>> {
+        val result = MutableLiveData<Resource<UpdateUserResponse>>()
+
+        viewModelScope.launch {
+            // Lakukan proses update user
+            val response = userUseCase.updateUser(updateUserModel)
+            result.postValue(response)
+        }
+
+        return result
     }
 }

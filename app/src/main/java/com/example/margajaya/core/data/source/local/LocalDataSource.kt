@@ -16,6 +16,7 @@ class LocalDataSource @Inject constructor(private val lapanganDao: LapanganDao, 
     suspend fun insertLapangan(lapanganList: List<LapanganEntity>) {
         lapanganDao.insertLapangan(lapanganList)
     }
+
     fun getProfile(): Flow<UserProfileEntity?> {
         return userDao.getProfile()
     }
@@ -23,6 +24,7 @@ class LocalDataSource @Inject constructor(private val lapanganDao: LapanganDao, 
     suspend fun insertProfile(profile: UserProfileEntity) {
         userDao.insertProfile(profile)
     }
+    suspend fun clearProfile() = userDao.clearProfile()
     fun getLapanganById(id: String): Flow<LapanganEntity> = lapanganDao.getLapanganById(id)
 
 /*    suspend fun deleteAllLapangan() {

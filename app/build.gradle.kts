@@ -83,6 +83,9 @@ dependencies {
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation ("androidx.security:security-crypto:1.1.0-alpha06")
+
+    //lottie
+    implementation ("com.airbnb.android:lottie:6.4.1")
     //slider
  /*   implementation ("com.github.denzcoskun:ImageSlideshow:0.1.2")*/
 }

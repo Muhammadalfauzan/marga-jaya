@@ -7,13 +7,16 @@ import com.example.margajaya.core.data.source.remote.response.LoginResponse
 import com.example.margajaya.core.data.source.remote.response.PaymentResponse
 import com.example.margajaya.core.data.source.remote.response.ProfileResponse
 import com.example.margajaya.core.data.source.remote.response.RegisterResponse
+import com.example.margajaya.core.data.source.remote.response.UpdateUserResponse
 import com.example.margajaya.core.domain.model.LoginModel
 import com.example.margajaya.core.domain.model.PaymentModel
 import com.example.margajaya.core.domain.model.RegisterModel
+import com.example.margajaya.core.domain.model.UpdateUserModel
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -52,6 +55,11 @@ interface ApiService {
 
     @GET("auth/users/me")
     suspend fun getProfile() : ProfileResponse
+
+    @PUT("users")
+    suspend fun updateUser(
+        @Body userRequest: UpdateUserModel
+    ): UpdateUserResponse
     /*
          */
 
