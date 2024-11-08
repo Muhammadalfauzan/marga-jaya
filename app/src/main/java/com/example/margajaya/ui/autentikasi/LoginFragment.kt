@@ -77,11 +77,11 @@ class LoginFragment : Fragment() {
         loginViewModel.loginResult.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
+               //     binding.progressBar.visibility = View.VISIBLE
                     Log.d("LoginFragment", "Loading...")
                 }
                 is Resource.Success -> {
-                    binding.progressBar.visibility = View.GONE
+                 //   binding.progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                     Log.d("LoginFragment", "Login successful, navigating to home")
 
@@ -91,7 +91,7 @@ class LoginFragment : Fragment() {
                     requireActivity().finish()
                 }
                 is Resource.Error -> {
-                    binding.progressBar.visibility = View.GONE
+                  //  binding.progressBar.visibility = View.GONE
                     Log.e("LoginFragment", "Login failed: ${result.message}")
                     Toast.makeText(requireContext(), result.message ?: "Login failed", Toast.LENGTH_LONG).show()
                 }

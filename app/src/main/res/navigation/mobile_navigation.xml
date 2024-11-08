@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/historyFragment">
+    app:startDestination="@id/homeFragment">
 
     <fragment
         android:id="@+id/homeFragment"
@@ -12,7 +12,9 @@
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_homeFragment_to_detailFragment"
-            app:destination="@id/detailFragment" />
+            app:destination="@id/detailFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
@@ -32,11 +34,25 @@
         android:id="@+id/historyFragment"
         android:name="com.example.margajaya.ui.history.HistoryFragment"
         android:label="fragment_history"
-        tools:layout="@layout/fragment_history" />
+        tools:layout="@layout/fragment_history" >
+
+    </fragment>
+
+  <!--  <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.margajaya.ui.history.HistoryFragment"
+        android:label="fragment_history">
+        <action
+            android:id="@+id/actionGlobalHistoryFragment"
+            app:destination="@id/historyFragment"
+            app:launchSingleTop="true" />
+    </fragment>-->
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.margajaya.ui.profile.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+
+    </fragment>
 
 </navigation>

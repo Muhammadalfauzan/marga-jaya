@@ -9,9 +9,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.example.margajaya.MainActivity
 import com.example.margajaya.R
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.core.domain.model.LapanganModel
@@ -36,19 +38,49 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
+        val mainActivity = activity as MainActivity
+        Log.d("DetailFragment", "BottomNav visibility in onViewCreated: ${mainActivity.binding.bottomNav.visibility}")
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val mainActivity = activity as MainActivity
+        Log.d("DetailFragment", "BottomNav visibility in onViewCreated: ${mainActivity.binding.bottomNav.visibility}")
         // Ambil id dan tanggal dari argumen navigasi
         val lapanganId = args.id
         val tanggal = args.tanggal.ifEmpty { getBookingDate() }
         Log.d("DetailFragment", "Fetching lapangan detail for ID: $lapanganId on date: $tanggal")
-
         observeLapanganData(lapanganId, tanggal) // Observe the data from ViewModel
         binding.tglDetailfrag.text = tanggal
         setupBookingButton(lapanganId, tanggal)
         observePaymentResult()
-        return binding.root
+        setupToolbar()
+
     }
 
+    override fun onResume() {
+        super.onResume()
+        enforceBottomNavVisibility(View.GONE) // Pastikan BottomNav tetap tersembunyi saat DetailFragment aktif
+    }
+
+    override fun onPause() {
+        super.onPause()
+        enforceBottomNavVisibility(View.VISIBLE) // Tampilkan kembali BottomNav saat meninggalkan DetailFragment
+    }
+    private fun enforceBottomNavVisibility(visibility: Int) {
+        val bottomNav = requireActivity().findViewById<View>(R.id.bottom_nav)
+        bottomNav.visibility = visibility
+        Log.d("DetailFragment", "Enforcing BottomNav visibility to ${if (visibility == View.GONE) "GONE" else "VISIBLE"}")
+    }
+
+    private fun setupToolbar() {
+        // Mengatur judul Toolbar di MainActivity
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            title = "Detail"
+            show()
+        }
+    }
     // Observe LiveData for lapangan data
     private fun observeLapanganData(id: String, tanggal: String) {
         detailViewModel.getLapById(id, tanggal).observe(viewLifecycleOwner) { resource ->

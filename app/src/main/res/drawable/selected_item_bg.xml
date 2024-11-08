@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Transparent background to keep other parts of item clear -->
+    <item android:bottom="3dp"> <!-- Mengangkat garis hijau ke atas dengan memberi padding pada bagian bawah -->
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+
+    <!-- Green line at the top of the item -->
+    <item android:top="0dp" android:left="0dp" android:right="0dp">
+        <shape android:shape="rectangle">
+            <size android:height="3dp" /> <!-- Thickness of the line -->
+            <solid android:color="#4CAF50" /> <!-- Color of the line -->
+        </shape>
+    </item>
+</layer-list>

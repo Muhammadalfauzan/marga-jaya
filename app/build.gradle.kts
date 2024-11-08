@@ -86,6 +86,8 @@ dependencies {
 
     //lottie
     implementation ("com.airbnb.android:lottie:6.4.1")
+
+    implementation ("nl.joery.animatedbottombar:library:1.1.0")
     //slider
  /*   implementation ("com.github.denzcoskun:ImageSlideshow:0.1.2")*/
 }

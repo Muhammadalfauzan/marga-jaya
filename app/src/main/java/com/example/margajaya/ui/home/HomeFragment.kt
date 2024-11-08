@@ -25,6 +25,7 @@ import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
 import com.example.margajaya.databinding.FragmentHomeBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import nl.joery.animatedbottombar.AnimatedBottomBar
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -39,7 +40,7 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var authPreferences: AuthPreferences
-    private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var bottomNavigationView: AnimatedBottomBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

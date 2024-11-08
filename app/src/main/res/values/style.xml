@@ -31,5 +31,8 @@
         <item name="tint">@color/white</item>
     </style>
 
+    <style name="BottomNavigationView_NoRipple" parent="Widget.Design.BottomNavigationView">
+        <item name="itemRippleColor">@android:color/transparent</item>
+    </style>
 
 </resources>

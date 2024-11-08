@@ -127,7 +127,7 @@
 
 
 
-            <FrameLayout
+          <!--  <FrameLayout
                 android:id="@+id/card_loading"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
@@ -146,7 +146,7 @@
                     android:layout_gravity="center" />
 
             </FrameLayout>
-
+-->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
