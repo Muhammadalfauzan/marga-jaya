@@ -39,6 +39,9 @@ class MainActivity : AppCompatActivity() {
                         // Jika berada di detailFragment, navigasikan kembali ke home
                         navController.navigateUp() // Menggunakan navigateUp akan kembali ke fragment sebelumnya (yaitu, home)
                     }
+                    R.id.buktiFragment ->{
+                        navController.navigateUp()
+                    }
                     R.id.historyFragment, R.id.profileFragment -> {
                         // Jika berada di history atau profile, navigasikan kembali ke home
                         navController.popBackStack(R.id.homeFragment, false)
@@ -79,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateBackToHome() {
+   /* private fun navigateBackToHome() {
         val navController = findNavController(R.id.nav_host_fragment)
         val currentDestinationId = navController.currentDestination?.id
         if (currentDestinationId == R.id.historyFragment || currentDestinationId == R.id.profileFragment) {
@@ -89,7 +92,7 @@ class MainActivity : AppCompatActivity() {
             // Jika sudah di home atau fragment lain, lakukan back biasa
             finish()
         }
-    }
+    }*/
 
     private fun navigateToFragment(navController: NavController, destinationId: Int) {
         val currentDestination = navController.currentDestination?.id
@@ -166,7 +169,7 @@ class MainActivity : AppCompatActivity() {
 
     // Fungsi ekstensi untuk menentukan apakah BottomNavigationView harus disembunyikan
     private fun Int.shouldHideBottomNav(): Boolean {
-        return this == R.id.detailFragment
+        return this == R.id.detailFragment || this == R.id.buktiFragment
     }
 
     // Fungsi ekstensi untuk menentukan apakah menu toolbar harus ditampilkan

@@ -36,6 +36,9 @@
         android:label="fragment_history"
         tools:layout="@layout/fragment_history" >
 
+        <action
+            android:id="@+id/action_historyFragment_to_buktiFragment"
+            app:destination="@id/buktiFragment" />
     </fragment>
 
   <!--  <fragment
@@ -54,5 +57,10 @@
         tools:layout="@layout/fragment_profile" >
 
     </fragment>
+    <fragment
+        android:id="@+id/buktiFragment"
+        android:name="com.example.margajaya.ui.buktibooking.BuktiFragment"
+        android:label="fragment_bukti"
+        tools:layout="@layout/fragment_bukti" />
 
 </navigation>

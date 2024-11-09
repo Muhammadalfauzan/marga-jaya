@@ -11,12 +11,12 @@ plugins {
 
 android {
     namespace = "com.example.margajaya"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.margajaya"
         minSdk = 27
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -88,6 +88,8 @@ dependencies {
     implementation ("com.airbnb.android:lottie:6.4.1")
 
     implementation ("nl.joery.animatedbottombar:library:1.1.0")
+
+    implementation ("androidx.work:work-runtime-ktx:2.10.0")
     //slider
  /*   implementation ("com.github.denzcoskun:ImageSlideshow:0.1.2")*/
 }

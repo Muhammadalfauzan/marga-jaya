@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.databinding.FragmentHistoryBinding
@@ -20,9 +21,11 @@ class HistoryFragment : Fragment() {
     private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
     private val bookingViewModel: BookingViewModel by viewModels()
-
+    private var isDataLoaded = false
     private val adapterBooking by lazy {
         AdapterBooking { bookingItem ->
+            val action = HistoryFragmentDirections.actionHistoryFragmentToBuktiFragment()
+            findNavController().navigate(action)
             Toast.makeText(requireContext(), "Clicked on ${bookingItem.jenisLapangan}", Toast.LENGTH_SHORT).show()
         }
     }
@@ -40,7 +43,10 @@ class HistoryFragment : Fragment() {
         setupToolbar()
         setupRecyclerView()
         observeBookingData()
-        bookingViewModel.getAllBookings() // Trigger fetch bookings
+        if (bookingViewModel.bookings.value == null) {
+            bookingViewModel.getAllBookings() // Trigger fetch bookings if not loaded yet
+        }
+
     }
 
     private fun setupToolbar() {
@@ -59,7 +65,7 @@ class HistoryFragment : Fragment() {
     }
 
     private fun observeBookingData() {
-        bookingViewModel.getAllBookings().observe(viewLifecycleOwner) { resource ->
+        bookingViewModel.bookings.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> showLoading()
                 is Resource.Success -> {

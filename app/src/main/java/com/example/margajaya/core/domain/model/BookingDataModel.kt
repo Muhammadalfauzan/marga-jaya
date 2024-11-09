@@ -1,6 +1,7 @@
 package com.example.margajaya.core.domain.model
 
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 
@@ -10,18 +11,45 @@ data class BookingDataModel(
 )
 @Parcelize
 data class BookingItemModel(
-    val jamMulai: String?,
-    val paymentLink: String?,
-    val createdAt: String?,
-    val paymentType: String?,
-    val harga: Int?,
-    val idLapangan: String?,
-    val name: String?,
+    @SerializedName("jam_mulai")
+    val jamMulai: String? = null,
+
+    @SerializedName("payment_link")
+    val paymentLink: String? = null,
+
+    @SerializedName("createdAt")
+    val createdAt: String? = null,
+
+    @SerializedName("payment_type")
+    val paymentType: String? = null,
+
+    @SerializedName("harga")
+    val harga: Int? = null,
+
+    @SerializedName("id_lapangan")
+    val idLapangan: String? = null,
+
+    @SerializedName("name")
+    val name: String? = null,
+
+    @SerializedName("transaction_time")
     val transactionTime: @RawValue Any?,
-    val id: String?,
-    val jamBerakhir: String?,
-    val tanggal: String?,
-    val jenisLapangan: String?,
-    val updatedAt: String?,
-    val status: String?
+
+    @SerializedName("id")
+    val id: String? = null,
+
+    @SerializedName("jam_berakhir")
+    val jamBerakhir: String? = null,
+
+    @SerializedName("tanggal")
+    val tanggal: String? = null,
+
+    @SerializedName("jenis_lapangan")
+    val jenisLapangan: String? = null,
+
+    @SerializedName("updatedAt")
+    val updatedAt: String? = null,
+
+    @SerializedName("status")
+    val status: String? = null
 ): Parcelable

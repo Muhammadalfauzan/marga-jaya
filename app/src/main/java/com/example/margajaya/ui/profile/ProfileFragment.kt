@@ -20,6 +20,7 @@ import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
 import com.example.margajaya.core.domain.model.ProfileModel
 import com.example.margajaya.core.domain.model.UpdateUserModel
 import com.example.margajaya.databinding.FragmentProfileBinding
+import com.example.margajaya.ui.history.BookingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -31,6 +32,7 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val userViewModel: UserViewModel by viewModels()
+    private val bookingViewModel: BookingViewModel by viewModels()
     private var isUserUpdated = false
     private var originalName: String = ""
     private var originalTelp: String = ""
@@ -49,7 +51,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        setUpLogoutButton()
+        setButtonTest()
         observeUserProfile()
         setupSwipeToRefresh()
         setupSaveButton()
@@ -66,9 +68,15 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun setUpLogoutButton() {
-        binding.btnLogout.setOnClickListener {
-            performLogout()
+    private fun setButtonTest() {
+        if (binding.btnTest != null) {
+            Log.d("ProfileFragment", "btnTest is not null. Setting onClickListener.")
+            binding.btnTest.setOnClickListener {
+                Log.d("ProfileFragment", "Test button clicked. Calling bookingViewModel.testNotification()")
+                bookingViewModel.testNotification()
+            }
+        } else {
+            Log.e("ProfileFragment", "btnTest is null. Cannot set onClickListener.")
         }
     }
 
