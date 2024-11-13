@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@android:color/white"/> <!-- Atur warna latar belakang -->
+    <size
+        android:width="60dp"
+        android:height="60dp" />
+    <corners android:radius="30dp" /> <!-- Atur radius untuk membuat bentuk lingkaran -->
+    <elevation android:elevation="4dp" /> <!-- Elevasi untuk bayangan jika diperlukan -->
+</shape>

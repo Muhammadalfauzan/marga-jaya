@@ -1,13 +1,19 @@
 package com.example.margajaya.ui.history
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.margajaya.R
 import com.example.margajaya.core.domain.model.BookingItemModel
 import com.example.margajaya.databinding.ItemListBookingBinding
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -30,23 +36,65 @@ class AdapterBooking(
 
         @SuppressLint("SetTextI18n")
         fun bind(bookingItem: BookingItemModel) {
-            // Memuat gambar jika ada URL gambar, misalnya lapangan yang di-booking
+            // Format tanggal
+            val bookingDate = formatTanggal(bookingItem.tanggal)
+
             // Menampilkan data booking
-            val tgl = bookingItem.tanggal
-            val sformat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-            val inputformat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX", Locale.getDefault())
-            val date = tgl?.let { inputformat.parse(it) }
-            val resultDate = date?.let { sformat.format(it) }
+            binding.tvCourtName.text = bookingItem.jenisLapangan
+            binding.tvSesi.text = "${bookingItem.jamMulai} - ${bookingItem.jamBerakhir}"
 
-            binding.tvJenlaphistory.text = bookingItem.jenisLapangan
-            binding.tvJamhistory.text = "${bookingItem.jamMulai} - ${bookingItem.jamBerakhir}"
-            binding.tvStatusBooking.text = bookingItem.status
-            binding.tvHarilap.text=resultDate
+            val statusTextView = binding.tvStatus
+            when (bookingItem.status?.lowercase()) {
+                "success" -> {
+                    statusTextView.setBackgroundResource(R.drawable.bg_status_success) // Hijau
+                    statusTextView.text = "Success"
+                    binding.tvLihat.visibility = View.VISIBLE
+                }
+                "pending" -> {
+                    statusTextView.setBackgroundResource(R.drawable.bg_status_pending) // Kuning
+                    statusTextView.text = "Pending"
+                    binding.tvLihat.visibility = View.GONE
+                }
+                "expired" -> {
+                    statusTextView.setBackgroundResource(R.drawable.bg_status_pending) // Merah
+                    statusTextView.text = "Expired"
+                    binding.tvLihat.visibility = View.GONE
+                }
+                else -> {
+                    statusTextView.setBackgroundResource(R.drawable.bg_status_pending) // Default jika ada
+                    statusTextView.text = "Unknown"
+                    binding.tvLihat.visibility = View.GONE
+                }
+            }
+            binding.tvBookingDate.text = bookingDate
+            Log.d("AdapterBooking", "Binding booking item: ${bookingItem.jenisLapangan}")
 
+            // Menampilkan atau menyembunyikan TextView "Lanjutkan Pembayaran" berdasarkan status
+            if (bookingItem.status != "success") {
+                binding.tvLanjutByr.visibility = View.VISIBLE
+                binding.tvLanjutByr.setOnClickListener {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(bookingItem.paymentLink))
+                    binding.root.context.startActivity(intent)
+                }
+            } else {
+                binding.tvLanjutByr.visibility = View.GONE
+            }
 
             // Mengatur klik item
             itemView.setOnClickListener {
                 onItemClick(bookingItem)
+            }
+        }
+
+        private fun formatTanggal(tanggal: String?): String {
+            if (tanggal.isNullOrEmpty()) return "Tanggal tidak tersedia"
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+            return try {
+                val date = inputFormat.parse(tanggal)
+                date?.let { outputFormat.format(it) } ?: "Tanggal tidak tersedia"
+            } catch (e: ParseException) {
+                "Tanggal tidak tersedia"
             }
         }
     }

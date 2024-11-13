@@ -35,21 +35,11 @@
         android:name="com.example.margajaya.ui.history.HistoryFragment"
         android:label="fragment_history"
         tools:layout="@layout/fragment_history" >
-
         <action
             android:id="@+id/action_historyFragment_to_buktiFragment"
             app:destination="@id/buktiFragment" />
     </fragment>
 
-  <!--  <fragment
-        android:id="@+id/historyFragment"
-        android:name="com.example.margajaya.ui.history.HistoryFragment"
-        android:label="fragment_history">
-        <action
-            android:id="@+id/actionGlobalHistoryFragment"
-            app:destination="@id/historyFragment"
-            app:launchSingleTop="true" />
-    </fragment>-->
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.margajaya.ui.profile.ProfileFragment"
@@ -61,6 +51,53 @@
         android:id="@+id/buktiFragment"
         android:name="com.example.margajaya.ui.buktibooking.BuktiFragment"
         android:label="fragment_bukti"
-        tools:layout="@layout/fragment_bukti" />
+        tools:layout="@layout/fragment_bukti" >
+        <argument
+            android:name="jenisLapangan"
+            app:argType="string" />
+        <argument
+            android:name="hari"
+            app:argType="string" />
+        <argument
+            android:name="sesi"
+            app:argType="string" />
+        <argument
+            android:name="harga"
+            app:argType="integer" />
+        <argument
+            android:name="tglBooking"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/upcomingFragment"
+        android:name="com.example.margajaya.ui.history.UpcomingFragment"
+        android:label="fragment_upcoming"
+        tools:layout="@layout/fragment_upcoming" >
+
+        <action
+            android:id="@+id/action_upcomingFragment_to_buktiFragment"
+            app:destination="@id/buktiFragment" >
+            <argument
+                android:name="jenisLapangan"
+                app:argType="string" />
+            <argument
+                android:name="hari"
+                app:argType="string" />
+            <argument
+                android:name="sesi"
+                app:argType="string" />
+            <argument
+                android:name="harga"
+                app:argType="integer" />
+            <argument
+                android:name="tglBooking"
+                app:argType="string" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/finishedFragment"
+        android:name="com.example.margajaya.ui.history.FinishedFragment"
+        android:label="fragment_finished"
+        tools:layout="@layout/fragment_finished" />
 
 </navigation>

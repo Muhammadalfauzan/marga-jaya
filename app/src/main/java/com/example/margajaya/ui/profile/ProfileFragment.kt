@@ -51,7 +51,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        setButtonTest()
+      //  setButtonTest()
         observeUserProfile()
         setupSwipeToRefresh()
         setupSaveButton()
@@ -68,17 +68,17 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun setButtonTest() {
-        if (binding.btnTest != null) {
-            Log.d("ProfileFragment", "btnTest is not null. Setting onClickListener.")
-            binding.btnTest.setOnClickListener {
-                Log.d("ProfileFragment", "Test button clicked. Calling bookingViewModel.testNotification()")
-                bookingViewModel.testNotification()
-            }
-        } else {
-            Log.e("ProfileFragment", "btnTest is null. Cannot set onClickListener.")
-        }
-    }
+//    private fun setButtonTest() {
+//        if (binding.btnTest != null) {
+//            Log.d("ProfileFragment", "btnTest is not null. Setting onClickListener.")
+//            binding.btnTest.setOnClickListener {
+//                Log.d("ProfileFragment", "Test button clicked. Calling bookingViewModel.testNotification()")
+//                bookingViewModel.testNotification()
+//            }
+//        } else {
+//            Log.e("ProfileFragment", "btnTest is null. Cannot set onClickListener.")
+//        }
+//    }
 
 
     @Deprecated("Deprecated in Java")

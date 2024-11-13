@@ -30,4 +30,7 @@
     <string name="role">Role</string>
     <string name="nb">*Jika ketika hari pesan/sewa tidak bisa datang,bisa merubah jadwal sewa pada h-1 sebelum hari sewa.</string>
     <string name="nb2">*Perubahan jadwal tersebut akan dilayani oleh Admin melalui whatsapp yang tertera pada menu pojok kiri atas .</string>
+    <string name="no_internet">no_internet_image_desc</string>
+
+
 </resources>

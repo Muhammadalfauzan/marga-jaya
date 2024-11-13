@@ -1,5 +1,6 @@
 package com.example.margajaya.ui.history
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,8 +12,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.margajaya.AutentikasiActivity
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.databinding.FragmentHistoryBinding
+import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,15 +25,6 @@ class HistoryFragment : Fragment() {
     private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
     private val bookingViewModel: BookingViewModel by viewModels()
-    private var isDataLoaded = false
-    private val adapterBooking by lazy {
-        AdapterBooking { bookingItem ->
-            val action = HistoryFragmentDirections.actionHistoryFragmentToBuktiFragment()
-            findNavController().navigate(action)
-            Toast.makeText(requireContext(), "Clicked on ${bookingItem.jenisLapangan}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,58 +35,28 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupToolbar()
-        setupRecyclerView()
-        observeBookingData()
-        if (bookingViewModel.bookings.value == null) {
-            bookingViewModel.getAllBookings() // Trigger fetch bookings if not loaded yet
-        }
+        setupViewPagerAndTabs()
+
 
     }
 
-    private fun setupToolbar() {
-        // Mengatur judul Toolbar di MainActivity
-        (activity as? AppCompatActivity)?.supportActionBar?.apply {
-            title = "History"
-            show()
-        }
-    }
+    private fun setupViewPagerAndTabs() {
+        val adapter = HistoryPagerAdapter(this)
+        binding.pager.adapter = adapter
 
-    private fun setupRecyclerView() {
-        binding.rvHistory.apply {
-            adapter = adapterBooking
-            layoutManager = LinearLayoutManager(requireContext())
-        }
-    }
-
-    private fun observeBookingData() {
-        bookingViewModel.bookings.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Loading -> showLoading()
-                is Resource.Success -> {
-                    hideLoading()
-                    adapterBooking.submitList(resource.data?.flatMap { it.bookings ?: emptyList() })
-                }
-                is Resource.Error -> {
-                    hideLoading()
-                    showError(resource.message)
-                }
+        TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "Upcoming Bookings"
+                1 -> "Past Bookings"
+                else -> throw IllegalStateException("Invalid position $position")
             }
-        }
+        }.attach()
     }
-
-    private fun showLoading() {
-        binding.progressBar.visibility = View.VISIBLE
-        Log.d("HistoryFragment", "Loading booking data...")
-    }
-
-    private fun hideLoading() {
-        binding.progressBar.visibility = View.GONE
-    }
-
-    private fun showError(message: String?) {
-        Log.e("HistoryFragment", "Error loading data: $message")
-        Toast.makeText(requireContext(), message ?: "Failed to load data", Toast.LENGTH_LONG).show()
+    private fun navigateToLogin() {
+        // Navigasi ke AuthMainActivity jika token expired
+        val intent = Intent(requireContext(), AutentikasiActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
     }
 
     override fun onDestroyView() {

@@ -1,0 +1,25 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Bayangan Gradiasi -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#90FFF6F6"
+                android:centerColor="#40000000"
+            android:endColor="#80000000"
+            android:angle="270"/> <!-- Arah gradiasi; 270 untuk dari atas ke bawah -->
+            <corners android:radius="8dp"/> <!-- Sudut melengkung jika diperlukan -->
+        </shape>
+    </item>
+
+    <!-- Latar belakang utama -->
+    <item android:top="4dp"> <!-- Mengatur jarak antara bayangan dan konten -->
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white"/> <!-- Warna latar belakang utama -->
+            <corners
+                android:topLeftRadius="8dp"
+                android:topRightRadius="8dp"
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp"/>  <!-- Sesuaikan radius dengan bayangan -->
+        </shape>
+    </item>
+</layer-list>

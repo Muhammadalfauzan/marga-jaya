@@ -22,6 +22,12 @@ import retrofit2.http.Query
 
 interface ApiService {
 
+    @GET("users/bookings")
+    suspend fun getAllBooking(): BookingResponse
+
+    @GET("auth/users/me")
+    suspend fun getProfile() : ProfileResponse
+
     @GET("lapangan")
     suspend fun getLapangan(
         @Query("tanggal") tanggal : String
@@ -50,11 +56,6 @@ interface ApiService {
         @Body postModel : PaymentModel
     ): PaymentResponse
 
-    @GET("users/bookings")
-    suspend fun getAllBooking(): BookingResponse
-
-    @GET("auth/users/me")
-    suspend fun getProfile() : ProfileResponse
 
     @PUT("users")
     suspend fun updateUser(

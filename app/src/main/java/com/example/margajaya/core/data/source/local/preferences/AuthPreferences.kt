@@ -2,6 +2,7 @@ package com.example.margajaya.core.data.source.local.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -39,7 +40,6 @@ class AuthPreferences @Inject constructor(@ApplicationContext context: Context) 
     fun getEmail(): String? {
         return sharedPreferences.getString("email_user", null)
     }
-
     fun clearUserData() {
         sharedPreferences.edit()
             .remove("auth_token")

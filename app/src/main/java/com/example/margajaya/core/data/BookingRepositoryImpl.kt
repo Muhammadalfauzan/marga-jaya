@@ -1,6 +1,9 @@
 package com.example.margajaya.core.data
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
 import com.example.margajaya.core.data.source.remote.RemoteDataSource
 import com.example.margajaya.core.data.source.remote.network.ApiResponse
 import com.example.margajaya.core.data.source.remote.response.BookingResponse
@@ -19,6 +22,7 @@ class BookingRepositoryImpl @Inject constructor(
 ) : BookingRepository {
 
     private var isDataLoaded = false
+
     override fun getAllBooking(): Flow<Resource<List<BookingDataModel>>> =
         object : NetworkOnlyResource<BookingResponse>() {
 
@@ -32,23 +36,17 @@ class BookingRepositoryImpl @Inject constructor(
                     is Resource.Success -> {
                         val bookingDataModels = resource.data?.data?.booking?.mapNotNull {
                             DataMapper.mapBookingItemToModel(it)
-                        }?.let { listOf(BookingDataModel(bookings = it, success = resource.data.success)) } ?: emptyList()
+                        }?.let {
+                            listOf(BookingDataModel(bookings = it, success = resource.data.success))
+                        } ?: emptyList()
                         isDataLoaded = true
-                        Log.d("BookingRepositoryImpl", "Fetched booking data successfully")
                         Resource.Success(bookingDataModels)
                     }
-                    is Resource.Loading -> {
-                        Log.d("BookingRepositoryImpl", "Loading booking data")
-                        Resource.Loading()
-                    }
-                    is Resource.Error -> {
-                        Log.e("BookingRepositoryImpl", "Error: ${resource.message}")
-                        Resource.Error(resource.message ?: "Unknown error")
-                    }
+                    is Resource.Loading -> Resource.Loading()
+                    is Resource.Error -> Resource.Error(resource.message ?: "Unknown error")
                 }
             }
             .catch { e ->
-                Log.e("BookingRepositoryImpl", "Caught error in repository flow: ${e.localizedMessage}")
-                emit(Resource.Error("An error occurred: ${e.localizedMessage}"))
+                Log.e("BookingRepositoryImpl", "Exception caught: ${e.localizedMessage}")
             }
 }

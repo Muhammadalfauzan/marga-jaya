@@ -30,161 +30,140 @@ class DetailFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val detailViewModel: DetailViewModel by viewModels()
-    private val paymentViewModel : PaymentViewModel by viewModels()
-    private val args: DetailFragmentArgs by navArgs() // Use navArgs to get arguments
+    private val paymentViewModel: PaymentViewModel by viewModels()
+    private val args: DetailFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
-        val mainActivity = activity as MainActivity
-        Log.d("DetailFragment", "BottomNav visibility in onViewCreated: ${mainActivity.binding.bottomNav.visibility}")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mainActivity = activity as MainActivity
-        Log.d("DetailFragment", "BottomNav visibility in onViewCreated: ${mainActivity.binding.bottomNav.visibility}")
-        // Ambil id dan tanggal dari argumen navigasi
+
         val lapanganId = args.id
-        val tanggal = args.tanggal.ifEmpty { getBookingDate() }
-        Log.d("DetailFragment", "Fetching lapangan detail for ID: $lapanganId on date: $tanggal")
-        observeLapanganData(lapanganId, tanggal) // Observe the data from ViewModel
+        val tanggal = args.tanggal.ifEmpty { getTodayDate() }
+        observeLapanganData(lapanganId, tanggal)
+
         binding.tglDetailfrag.text = tanggal
         setupBookingButton(lapanganId, tanggal)
         observePaymentResult()
         setupToolbar()
 
+        toggleBottomNavVisibility(View.GONE)
     }
 
     override fun onResume() {
         super.onResume()
-        enforceBottomNavVisibility(View.GONE) // Pastikan BottomNav tetap tersembunyi saat DetailFragment aktif
+        toggleBottomNavVisibility(View.GONE)
     }
 
     override fun onPause() {
         super.onPause()
-        enforceBottomNavVisibility(View.VISIBLE) // Tampilkan kembali BottomNav saat meninggalkan DetailFragment
+        toggleBottomNavVisibility(View.VISIBLE)
     }
-    private fun enforceBottomNavVisibility(visibility: Int) {
-        val bottomNav = requireActivity().findViewById<View>(R.id.bottom_nav)
-        bottomNav.visibility = visibility
-        Log.d("DetailFragment", "Enforcing BottomNav visibility to ${if (visibility == View.GONE) "GONE" else "VISIBLE"}")
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupToolbar() {
-        // Mengatur judul Toolbar di MainActivity
         (activity as? AppCompatActivity)?.supportActionBar?.apply {
             title = "Detail"
             show()
         }
     }
-    // Observe LiveData for lapangan data
+
+    private fun toggleBottomNavVisibility(visibility: Int) {
+        val bottomNav = requireActivity().findViewById<View>(R.id.bottom_nav)
+        bottomNav.visibility = visibility
+    }
+
     private fun observeLapanganData(id: String, tanggal: String) {
         detailViewModel.getLapById(id, tanggal).observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    Log.d("DetailFragment", "Loading lapangan data...")
-                }
+                is Resource.Loading -> showLoading(true)
                 is Resource.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    resource.data?.let { lapangan ->
-                        updateUI(lapangan) // Update UI with lapangan data
-                        Log.d("DetailFragment", "Lapangan data loaded: $lapangan")
-                    }
+                    showLoading(false)
+                    resource.data?.let { updateUI(it) }
                 }
                 is Resource.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(
-                        requireContext(),
-                        "Error: ${resource.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    Log.e("DetailFragment", "Error loading data: ${resource.message}")
+                    showLoading(false)
+                    showError(resource.message)
                 }
             }
         }
     }
+
     private fun setupBookingButton(idLapang: String, dateByStatus: String) {
         binding.btnPesan.setOnClickListener {
             val paymentModel = PaymentModel(id_lapangan = idLapang, tanggal = dateByStatus)
-            paymentViewModel.processPayment(paymentModel) // Call processPayment
+            paymentViewModel.processPayment(paymentModel)
         }
     }
 
     private fun observePaymentResult() {
         paymentViewModel.paymentResult.observe(viewLifecycleOwner) { result ->
             when (result) {
-                is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                }
+                is Resource.Loading -> showLoading(true)
                 is Resource.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    result.data?.data?.redirectUrl?.let { url ->
-                        intentMidtrans(url)
-                    }
+                    showLoading(false)
+                    result.data?.data?.redirectUrl?.let { intentMidtrans(it) }
                     Toast.makeText(requireContext(), "Berhasil melakukan booking lapangan", Toast.LENGTH_SHORT).show()
+                    binding.btnPesan.isEnabled = false
+                    binding.btnPesan.text = "Pesanan Berhasil"
+                    // Ubah status lapangan menjadi "Tidak Tersedia"
+                    binding.tvStatusdetailfrag.text = "TIDAK TERSEDIA"
+                    binding.tvStatusdetailfrag.setTextColor(resources.getColor(R.color.primary, null))
                 }
                 is Resource.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(requireContext(), result.message ?: "Gagal dalam melakukan booking lapangan", Toast.LENGTH_SHORT).show()
+                    showLoading(false)
+                    showError(result.message)
                 }
             }
         }
     }
+
     private fun intentMidtrans(redirectUrl: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(redirectUrl))
         startActivity(intent)
     }
-    // Update UI with lapangan data
+
     private fun updateUI(lapangan: LapanganModel) {
         binding.apply {
-            // Update ketersediaan
             tvStatusdetailfrag.text = if (lapangan.available) "TERSEDIA" else "TIDAK TERSEDIA"
             tvStatusdetailfrag.setTextColor(
-                resources.getColor(
-                    if (lapangan.available) R.color.green else R.color.primary,
-                    null
-                )
+                resources.getColor(if (lapangan.available) R.color.green else R.color.primary, null)
             )
-
-            // Update jenis lapangan
             tvJenisdeatailfrag.text = lapangan.jenisLapangan
-
-            // Update harga
             tvHargadetailfrag.text = "Rp.${lapangan.harga}/sesi"
-
-            // Update jam mulai dan berakhir
             tvJamdetailfrag.text = "${lapangan.jamMulai} - ${lapangan.jamBerakhir}"
-
-            // Update deskripsi (asumsikan jenisLapangan sebagai deskripsi jika tidak ada kolom deskripsi yang lain)
             tvDescdetailfrag.text = lapangan.deskripsi
-
-            // Update tombol pesan (aktifkan jika available)
             btnPesan.isEnabled = lapangan.available
 
-            // Load image using Glide (ambil gambar pertama, jika ada)
             val imageUrl = lapangan.imageUrls.firstOrNull()
             Glide.with(this@DetailFragment)
                 .load(imageUrl)
-                .placeholder(R.drawable.appmarga) // Placeholder jika gambar belum tersedia
-                .error(R.drawable.appmarga) // Gambar error jika gagal memuat
+                .placeholder(R.drawable.appmarga)
+                .error(R.drawable.appmarga)
                 .into(imgSlider)
         }
     }
 
-    private fun getBookingDate(): String {
+    private fun getTodayDate(): String {
         val dateFormat = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault())
-        val date = Date()
-        return dateFormat.format(date)
+        return dateFormat.format(Date())
     }
 
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null // Avoid memory leaks by clearing binding
+    private fun showError(message: String?) {
+        Toast.makeText(requireContext(), message ?: "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
     }
 }

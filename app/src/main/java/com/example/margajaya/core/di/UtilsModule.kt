@@ -1,7 +1,8 @@
 package com.example.margajaya.core.di
 
 import android.content.Context
-import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
+import com.example.margajaya.core.utils.NetworkHelper
+import com.example.margajaya.core.utils.NetworkUtils
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,12 +12,12 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object PreferencesModule {
+object UtilsModule {
 
     @Provides
     @Singleton
-    fun provideAuthPreferences(@ApplicationContext context: Context): AuthPreferences {
-        return AuthPreferences(context)
+    fun provideNetworkHelper(@ApplicationContext context: Context): NetworkHelper {
+        return NetworkUtils(context)
     }
-
 }
+

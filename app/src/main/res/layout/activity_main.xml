@@ -56,32 +56,19 @@
         app:navGraph="@navigation/mobile_navigation"
         app:defaultNavHost="true" />
 
-    <!-- BottomNavigationView di bagian bawah layar -->
-<!--    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav"
-        style="@style/BottomNavigationView_NoRipple"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:itemIconTint="@drawable/bg_selector"
-        android:background="?android:attr/windowBackground"
-        app:itemBackground="@drawable/button_nav_bg"
-
-        app:itemRippleColor="@android:color/transparent"
-        app:menu="@menu/buttom_nav_menu" />-->
     <nl.joery.animatedbottombar.AnimatedBottomBar
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/white"
         android:fitsSystemWindows="true"
         app:abb_indicatorAppearance="round"
         app:abb_indicatorHeight="4dp"
-        app:abb_indicatorMargin="16dp"
+        app:abb_indicatorMargin="0dp"
         app:abb_selectedIndex="0"
+        app:elevation="60dp"
         app:abb_selectedTabType="text"
-
+        android:background="@drawable/bg_buttom_nav"
         app:abb_tabs="@menu/buttom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -78,8 +78,6 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:19.0.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7" )
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation ("androidx.security:security-crypto:1.1.0-alpha06")
@@ -90,6 +88,9 @@ dependencies {
     implementation ("nl.joery.animatedbottombar:library:1.1.0")
 
     implementation ("androidx.work:work-runtime-ktx:2.10.0")
+
+    implementation (libs.lifecycle.livedata.ktx)
+    implementation (libs.androidx.lifecycle.lifecycle.viewmodel.ktx)
     //slider
  /*   implementation ("com.github.denzcoskun:ImageSlideshow:0.1.2")*/
 }

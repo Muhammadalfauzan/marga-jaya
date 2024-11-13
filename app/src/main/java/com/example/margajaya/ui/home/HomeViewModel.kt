@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.core.domain.model.LapanganModel
 import com.example.margajaya.core.domain.usecase.LapanganUseCase
+import com.example.margajaya.core.utils.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -17,27 +18,33 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val lapanganUseCase: LapanganUseCase
+    private val lapanganUseCase: LapanganUseCase,
+    private val networkUtils: NetworkUtils
 ) : ViewModel() {
-
 
     private val _lapangan = MutableLiveData<Resource<List<LapanganModel>>>()
     val lapangan: LiveData<Resource<List<LapanganModel>>> get() = _lapangan
 
     init {
-        fetchLapanganData(getCurrentDate()) // Fetch data dengan tanggal saat ini saat ViewModel dibuat
+        fetchLapanganData(getCurrentDate())
     }
 
     private fun getCurrentDate(): String {
         return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
     }
+
     fun fetchLapanganData(tanggal: String) {
-        viewModelScope.launch {
-            lapanganUseCase.getLapangan(tanggal).collect { resource ->
-                _lapangan.value = resource // Update LiveData dengan data terbaru
+        if (networkUtils.isNetworkAvailable()) {
+            viewModelScope.launch {
+                lapanganUseCase.getLapangan(tanggal).collect { resource ->
+                    _lapangan.value = resource
+                }
             }
+        } else {
+            _lapangan.value = Resource.Error("No internet connection")
         }
     }
 }
+
 // Langsung mengonversi Flow menjadi LiveData
 //val lapangan = lapanganUseCase.getLapangan("2024-10-31").asLiveData()
