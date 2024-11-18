@@ -3,17 +3,17 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
-    id("com.google.devtools.ksp") // <------------- without version
+    id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
 
 }
 
 android {
-    namespace = "com.example.margajaya"
+    namespace = "com.example.kamandanoe"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.margajaya"
+        applicationId = "com.example.kamandanoe"
         minSdk = 27
         targetSdk = 35
         versionCode = 1
@@ -72,11 +72,9 @@ android {
         implementation(libs.retrofit)
         implementation(libs.converter.gson)
 
-
         //google maps
         implementation("com.google.android.gms:play-services-maps:19.0.0")
         implementation("com.google.android.gms:play-services-location:21.3.0")
-
 
         implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
         implementation("androidx.security:security-crypto:1.1.0-alpha06")

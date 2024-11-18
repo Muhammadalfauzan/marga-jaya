@@ -49,7 +49,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_login"
                 app:startIconDrawable="@drawable/ic_email">
 
-                <com.example.margajaya.ui.customview.EmailCustom
+                <com.example.kamandanoe.ui.customview.EmailCustom
                     android:id="@+id/ed_emaillog"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/emaillog_lay"
                 app:startIconDrawable="@drawable/ic_lock">
 
-                <com.example.margajaya.ui.customview.PasswordCustom
+                <com.example.kamandanoe.ui.customview.PasswordCustom
                     android:id="@+id/ed_pass_log"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.example.margajaya.ui.customview.ButtonLogin
+            <com.example.kamandanoe.ui.customview.ButtonLogin
                 android:id="@+id/buttonlog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

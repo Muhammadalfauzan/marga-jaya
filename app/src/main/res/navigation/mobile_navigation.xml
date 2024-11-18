@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.margajaya.ui.home.HomeFragment"
+        android:name="com.example.kamandanoe.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.example.margajaya.ui.detail.DetailFragment"
+        android:name="com.example.kamandanoe.ui.detail.DetailFragment"
         android:label="fragment_detail"
         tools:layout="@layout/fragment_detail" >
 
@@ -32,7 +32,7 @@
     </fragment>
     <fragment
         android:id="@+id/historyFragment"
-        android:name="com.example.margajaya.ui.history.HistoryFragment"
+        android:name="com.example.kamandanoe.ui.history.HistoryFragment"
         android:label="fragment_history"
         tools:layout="@layout/fragment_history" >
         <action
@@ -42,14 +42,14 @@
 
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.margajaya.ui.profile.ProfileFragment"
+        android:name="com.example.kamandanoe.ui.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" >
 
     </fragment>
     <fragment
         android:id="@+id/buktiFragment"
-        android:name="com.example.margajaya.ui.buktibooking.BuktiFragment"
+        android:name="com.example.kamandanoe.ui.buktibooking.BuktiFragment"
         android:label="fragment_bukti"
         tools:layout="@layout/fragment_bukti" >
         <argument
@@ -70,7 +70,7 @@
     </fragment>
     <fragment
         android:id="@+id/upcomingFragment"
-        android:name="com.example.margajaya.ui.history.UpcomingFragment"
+        android:name="com.example.kamandanoe.ui.history.UpcomingFragment"
         android:label="fragment_upcoming"
         tools:layout="@layout/fragment_upcoming" >
 
@@ -96,7 +96,7 @@
     </fragment>
     <fragment
         android:id="@+id/finishedFragment"
-        android:name="com.example.margajaya.ui.history.FinishedFragment"
+        android:name="com.example.kamandanoe.ui.history.FinishedFragment"
         android:label="fragment_finished"
         tools:layout="@layout/fragment_finished" />
 
