@@ -18,6 +18,7 @@ class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
         // Context of the app under test.
+        @Suppress("UNUSED_VARIABLE")
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
     }
 }

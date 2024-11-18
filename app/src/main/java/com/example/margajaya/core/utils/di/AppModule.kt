@@ -1,8 +1,6 @@
 package com.example.margajaya.core.utils.di
 
-import android.content.Context
-import com.example.margajaya.core.data.AuthRepositoryImpl
-import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
+
 import com.example.margajaya.core.domain.usecase.AuthInteractor
 import com.example.margajaya.core.domain.usecase.AuthUseCase
 import com.example.margajaya.core.domain.usecase.BookingInteractor

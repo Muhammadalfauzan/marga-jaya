@@ -21,12 +21,11 @@ import com.example.margajaya.AutentikasiActivity
 import com.example.margajaya.MainActivity
 import com.example.margajaya.R
 import com.example.margajaya.core.data.Resource
-import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
+import com.example.margajaya.core.domain.preferences.AuthPreferences
 import com.example.margajaya.core.utils.NetworkUtils
 import com.example.margajaya.databinding.FragmentHomeBinding
 import com.example.margajaya.ui.autentikasi.NoInternetBottomSheet
 import com.example.margajaya.ui.callsback.OnRetryListener
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import nl.joery.animatedbottombar.AnimatedBottomBar
 import java.text.SimpleDateFormat

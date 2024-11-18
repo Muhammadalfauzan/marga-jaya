@@ -3,17 +3,15 @@ package com.example.margajaya.ui.detail
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
-import com.example.margajaya.MainActivity
 import com.example.margajaya.R
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.core.domain.model.LapanganModel
@@ -26,12 +24,15 @@ import java.util.Locale
 
 @AndroidEntryPoint
 class DetailFragment : Fragment() {
+
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
 
     private val detailViewModel: DetailViewModel by viewModels()
     private val paymentViewModel: PaymentViewModel by viewModels()
     private val args: DetailFragmentArgs by navArgs()
+
+    private var currentLapangan: LapanganModel? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,17 +44,7 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val lapanganId = args.id
-        val tanggal = args.tanggal.ifEmpty { getTodayDate() }
-        observeLapanganData(lapanganId, tanggal)
-
-        binding.tglDetailfrag.text = tanggal
-        setupBookingButton(lapanganId, tanggal)
-        observePaymentResult()
-        setupToolbar()
-
-        toggleBottomNavVisibility(View.GONE)
+        setupUI()
     }
 
     override fun onResume() {
@@ -69,6 +60,28 @@ class DetailFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setupUI() {
+        val lapanganId = args.id
+        val rawDate = args.tanggal.ifEmpty { getTodayDate() }
+        val formattedDate = convertToRequiredDateFormat(rawDate)
+        observeLapanganData(lapanganId, formattedDate)
+        binding.tglDetailfrag.text = formattedDate
+        setupBookingButton(lapanganId, formattedDate)
+        observePaymentResult()
+        setupToolbar()
+    }
+
+    private fun convertToRequiredDateFormat(dateString: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val date = inputFormat.parse(dateString)
+            date?.let { outputFormat.format(it) } ?: dateString
+        } catch (e: Exception) {
+            dateString
+        }
     }
 
     private fun setupToolbar() {
@@ -89,7 +102,10 @@ class DetailFragment : Fragment() {
                 is Resource.Loading -> showLoading(true)
                 is Resource.Success -> {
                     showLoading(false)
-                    resource.data?.let { updateUI(it) }
+                    resource.data?.let {
+                        currentLapangan = it
+                        updateUI(it)
+                    }
                 }
                 is Resource.Error -> {
                     showLoading(false)
@@ -101,9 +117,17 @@ class DetailFragment : Fragment() {
 
     private fun setupBookingButton(idLapang: String, dateByStatus: String) {
         binding.btnPesan.setOnClickListener {
-            val paymentModel = PaymentModel(id_lapangan = idLapang, tanggal = dateByStatus)
+            currentLapangan?.let {
+                showCustomBookingDialog(it, idLapang, dateByStatus)
+            } ?: showError("Data lapangan tidak tersedia.")
+        }
+    }
+
+    private fun showCustomBookingDialog(lapangan: LapanganModel, idLapang: String, dateByStatus: String) {
+        val dialogFragment = CustomBookingDialogFragment(lapangan, idLapang, dateByStatus) { paymentModel ->
             paymentViewModel.processPayment(paymentModel)
         }
+        dialogFragment.show(parentFragmentManager, "CustomBookingDialogFragment")
     }
 
     private fun observePaymentResult() {
@@ -114,11 +138,7 @@ class DetailFragment : Fragment() {
                     showLoading(false)
                     result.data?.data?.redirectUrl?.let { intentMidtrans(it) }
                     Toast.makeText(requireContext(), "Berhasil melakukan booking lapangan", Toast.LENGTH_SHORT).show()
-                    binding.btnPesan.isEnabled = false
-                    binding.btnPesan.text = "Pesanan Berhasil"
-                    // Ubah status lapangan menjadi "Tidak Tersedia"
-                    binding.tvStatusdetailfrag.text = "TIDAK TERSEDIA"
-                    binding.tvStatusdetailfrag.setTextColor(resources.getColor(R.color.primary, null))
+                    updateBookingButtonState()
                 }
                 is Resource.Error -> {
                     showLoading(false)
@@ -131,6 +151,13 @@ class DetailFragment : Fragment() {
     private fun intentMidtrans(redirectUrl: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(redirectUrl))
         startActivity(intent)
+    }
+
+    private fun updateBookingButtonState() {
+        binding.btnPesan.isEnabled = false
+        binding.btnPesan.text = "Pesanan Berhasil"
+        binding.tvStatusdetailfrag.text = "TIDAK TERSEDIA"
+        binding.tvStatusdetailfrag.setTextColor(resources.getColor(R.color.primary, null))
     }
 
     private fun updateUI(lapangan: LapanganModel) {

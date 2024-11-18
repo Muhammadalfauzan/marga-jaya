@@ -1,6 +1,6 @@
 package com.example.margajaya.ui.history
 
-
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.core.domain.model.BookingDataModel
 import com.example.margajaya.core.domain.model.BookingItemModel
+import com.example.margajaya.core.domain.preferences.AuthPreferences
+
+
 import com.example.margajaya.core.domain.usecase.BookingUseCase
 import com.example.margajaya.core.domain.usecase.notif.NotificationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +24,10 @@ import javax.inject.Inject
 @HiltViewModel
 class BookingViewModel @Inject constructor(
     private val bookingUseCase: BookingUseCase,
-    private val notificationUseCase: NotificationUseCase
-) : ViewModel() {
+    private val authPreferences: AuthPreferences,
+    private val notificationUseCase: NotificationUseCase,
+
+    ) : ViewModel() {
 
     private val _bookings = MutableLiveData<Resource<List<BookingDataModel>>>()
     val bookings: LiveData<Resource<List<BookingDataModel>>> get() = _bookings
@@ -33,40 +38,52 @@ class BookingViewModel @Inject constructor(
     private val _upcomingBookings = MutableLiveData<Resource<List<BookingItemModel>>>()
     val upcomingBookings: LiveData<Resource<List<BookingItemModel>>> get() = _upcomingBookings
 
-    fun getAllBookings() {
-        // Set initial loading state
-        _bookings.value = Resource.Loading()
-        _pastBookings.value = Resource.Loading()
-        _upcomingBookings.value = Resource.Loading()
+    private val _showSessionExpiredDialog = MutableLiveData<Boolean>()
+    val showSessionExpiredDialog: LiveData<Boolean> get() = _showSessionExpiredDialog
 
+    fun getAllBookings() {
+        _bookings.value = Resource.Loading()
+        _upcomingBookings.value = Resource.Loading()
+        _pastBookings.value =Resource.Loading()
         viewModelScope.launch {
             bookingUseCase.getAllBooking().collect { resource ->
                 _bookings.value = resource
-
-                if (resource is Resource.Success) {
-                    val allBookings = resource.data?.flatMap { it.bookings.orEmpty() } ?: emptyList()
-
-                    // Filter data booking untuk past dan upcoming bookings
-                    val past = filterPastBookings(allBookings)
-                    val upcoming = filterUpcomingBookings(allBookings)
-
-                    _pastBookings.value = Resource.Success(past)
-                    _upcomingBookings.value = Resource.Success(upcoming)
-
-                    _pastBookings.value = Resource.Success(filterPastBookings(allBookings))
-                    _upcomingBookings.value = Resource.Success(filterUpcomingBookings(allBookings))
-
-                    resource.data?.forEach { bookingData ->
-                        bookingData.bookings?.forEach { bookingItem ->
-                            scheduleNotification(bookingItem)
+                when (resource) {
+                    is Resource.Success -> {
+                        val allBookings = resource.data?.flatMap { it.bookings.orEmpty() } ?: emptyList()
+                        val upcoming = filterUpcomingBookings(allBookings)
+                        val pastBooking = filterPastBookings(allBookings)
+                        _upcomingBookings.value = Resource.Success(upcoming)
+                        _pastBookings.value = Resource.Success(pastBooking)
+                        // Schedule notifications for upcoming bookings
+                        allBookings.forEach { bookingItem ->
+                            if (bookingItem.status == "success") {
+                                scheduleNotification(bookingItem)
+                            }
                         }
                     }
-                } else if (resource is Resource.Error) {
-                    _pastBookings.value = Resource.Error(resource.message ?: "Unknown error")
-                    _upcomingBookings.value = Resource.Error(resource.message ?: "Unknown error")
+                    is Resource.Error -> {
+                        Log.d("BookingViewModel", "Error message received: '${resource.message}'")
+
+                        if (resource.message?.trim() == "Session expired. Please log in again.") {
+                            Log.d("BookingViewModel", "Session expired triggered")
+                            authPreferences.clearUserData()
+                            _showSessionExpiredDialog.value = true
+                            Log.d("BookingViewModel", "Session expired dialog state updated: ${_showSessionExpiredDialog.value}")
+                        } else {
+                            Log.d("BookingViewModel", "Message did not match: '${resource.message?.trim()}'")
+                            _upcomingBookings.value = Resource.Error(resource.message ?: "Unknown error")
+                            _pastBookings.value = Resource.Error(resource.message ?: "Unknown error")
+                        }
+                    }
+                    is Resource.Loading -> Unit
                 }
             }
         }
+    }
+
+    fun resetSessionExpiredState() {
+        _showSessionExpiredDialog.value = false
     }
 
     // Fungsi untuk memfilter booking yang sudah terlewatkan

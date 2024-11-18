@@ -32,5 +32,8 @@
     <string name="nb2">*Perubahan jadwal tersebut akan dilayani oleh Admin melalui whatsapp yang tertera pada menu pojok kiri atas .</string>
     <string name="no_internet">no_internet_image_desc</string>
 
-
+        <string name="session_expired_title">Session Expired</string>
+        <string name="session_expired_message">Your session has expired. Please login again.</string>
+        <string name="login">Login</string>
+        <string name="error_default_message">An error occurred. Please try again later.</string>
 </resources>

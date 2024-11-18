@@ -13,6 +13,7 @@
     </style>
 
 
+
     <style name="SnipetCustom" parent="@style/Widget.Material3.CardView.Filled">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance_custom_corners</item>
     </style>
@@ -40,5 +41,15 @@
         <item name="android:windowExitAnimation">@anim/slide_out_top</item>
      <!-- Tambahkan ini untuk transparansi -->
     </style>
+
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/rounded_corner</item>
+    </style>
+
+    <style name="FadeDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/fade_in_anim</item>
+        <item name="android:windowExitAnimation">@anim/fade_out_anim</item>
+    </style>
+
 
 </resources>

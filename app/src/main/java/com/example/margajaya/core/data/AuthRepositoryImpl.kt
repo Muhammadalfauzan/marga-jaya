@@ -1,10 +1,10 @@
 package com.example.margajaya.core.data
 
-import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
 import com.example.margajaya.core.data.source.remote.network.ApiService
 import com.example.margajaya.core.data.source.remote.response.LoginResponse
 import com.example.margajaya.core.domain.model.LoginModel
 import com.example.margajaya.core.domain.model.RegisterModel
+import com.example.margajaya.core.domain.preferences.AuthPreferences
 import com.example.margajaya.core.domain.repository.AuthRepository
 import javax.inject.Inject
 

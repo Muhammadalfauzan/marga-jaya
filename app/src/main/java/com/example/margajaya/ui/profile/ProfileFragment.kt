@@ -5,20 +5,22 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.margajaya.AutentikasiActivity
 import com.example.margajaya.R
 import com.example.margajaya.core.data.Resource
-import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
 import com.example.margajaya.core.domain.model.ProfileModel
 import com.example.margajaya.core.domain.model.UpdateUserModel
+import com.example.margajaya.core.domain.preferences.AuthPreferences
 import com.example.margajaya.databinding.FragmentProfileBinding
 import com.example.margajaya.ui.history.BookingViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,6 +59,10 @@ class ProfileFragment : Fragment() {
         setupSaveButton()
         setupTextWatchers()
         setUpToolbar()
+
+        binding.btnTest.setOnClickListener {
+            showCustomBookingDialog()
+        }
     }
 
     private fun setUpToolbar() {
@@ -67,6 +73,21 @@ class ProfileFragment : Fragment() {
             show()
         }
     }
+
+
+    private fun showCustomBookingDialog() {
+        val builder = AlertDialog.Builder(requireContext(),R.style.CustomAlertDialog)
+            .create()
+        val view = layoutInflater.inflate(R.layout.tes_alert,null)
+        val  button = view.findViewById<Button>(R.id.dialogDismiss_button)
+        builder.setView(view)
+        button.setOnClickListener {
+            builder.dismiss()
+        }
+        builder.setCanceledOnTouchOutside(false)
+        builder.show()
+    }
+
 
 //    private fun setButtonTest() {
 //        if (binding.btnTest != null) {

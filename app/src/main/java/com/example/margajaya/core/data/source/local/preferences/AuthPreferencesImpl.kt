@@ -1,14 +1,15 @@
 package com.example.margajaya.core.data.source.local.preferences
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.util.Log
+
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.example.margajaya.core.domain.preferences.AuthPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class AuthPreferences @Inject constructor(@ApplicationContext context: Context) {
+class AuthPreferencesImpl @Inject constructor(@ApplicationContext context: Context) :
+    AuthPreferences {
 
     // Membuat alias master key untuk enkripsi
     private val masterKeyAlias = MasterKey.Builder(context)
@@ -24,26 +25,27 @@ class AuthPreferences @Inject constructor(@ApplicationContext context: Context) 
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    fun saveAuthToken(token: String) {
+    override fun saveAuthToken(token: String) {
         sharedPreferences.edit().putString("auth_token", token).apply()
     }
 
-    fun getAuthToken(): String? {
+    override fun getAuthToken(): String? {
         return sharedPreferences.getString("auth_token", null)
     }
 
-    // Fungsi tambahan untuk data sensitif lainnya
-    fun saveEmail(email: String) {
+    override fun saveEmail(email: String) {
         sharedPreferences.edit().putString("email_user", email).apply()
     }
 
-    fun getEmail(): String? {
-        return sharedPreferences.getString("email_user", null)
-    }
-    fun clearUserData() {
+    override fun clearUserData() {
         sharedPreferences.edit()
             .remove("auth_token")
             .remove("email_user")
             .apply()
     }
+
+    override fun getEmail(): String? {
+        return sharedPreferences.getString("email_user", null)
+    }
 }
+

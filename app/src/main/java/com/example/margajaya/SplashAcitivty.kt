@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
-import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
+import com.example.margajaya.core.domain.preferences.AuthPreferences
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

@@ -7,9 +7,15 @@
     android:background="@drawable/bgmarga"
     tools:context=".ui.detail.DetailFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="ScrollViewSize">
 
         <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
@@ -178,5 +184,5 @@
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

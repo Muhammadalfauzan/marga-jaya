@@ -1,5 +1,6 @@
 package com.example.margajaya.ui.history
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.ParseException
 import android.net.Uri
@@ -13,6 +14,7 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.margajaya.AutentikasiActivity
 import com.example.margajaya.core.data.Resource
 import com.example.margajaya.core.domain.model.BookingItemModel
 import com.example.margajaya.databinding.FragmentFinishedBinding
@@ -45,7 +47,7 @@ class UpcomingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        observePastBookings()
+        observeViewModel()
         if (bookingViewModel.upcomingBookings.value == null) {
             bookingViewModel.getAllBookings() // Panggil jika belum ada data
         }
@@ -65,7 +67,7 @@ class UpcomingFragment : Fragment() {
             val bookingDate = bookingItem.tanggal?.let {
                 try {
                     val parsedDate = inputFormat.parse(it)
-                    sformat.format(parsedDate)
+                    parsedDate?.let { date -> sformat.format(date) } ?: "Tanggal tidak tersedia"
                 } catch (e: ParseException) {
                     "Tanggal tidak tersedia"
                 }
@@ -75,7 +77,7 @@ class UpcomingFragment : Fragment() {
             val bookingOrderDate = bookingItem.createdAt?.let {
                 try {
                     val parsedDate = inputFormat.parse(it)
-                    sformat.format(parsedDate)
+                    parsedDate?.let { date -> sformat.format(date) } ?: "Tanggal tidak tersedia"
                 } catch (e: ParseException) {
                     "Tanggal tidak tersedia"
                 }
@@ -105,26 +107,47 @@ class UpcomingFragment : Fragment() {
         }
     }
 
-    private fun observePastBookings() {
+    private fun observeViewModel() {
         bookingViewModel.upcomingBookings.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Loading -> binding.progressBar.visibility = View.VISIBLE
+                is Resource.Loading -> showLoading()
                 is Resource.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    adapterBooking.submitList(resource.data ?: emptyList())
-                    binding.isEmpty.visibility = View.VISIBLE
+                    hideLoading()
+                    adapterBooking.submitList(resource.data)
+                    binding.isEmpty.visibility = if (resource.data.isNullOrEmpty()) View.VISIBLE else View.GONE
                 }
                 is Resource.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
+                    hideLoading()
+                    showError(resource.message)
                 }
+            }
+        }
+
+        bookingViewModel.showSessionExpiredDialog.observe(viewLifecycleOwner) { shouldShow ->
+            Log.d("UpcomingFragment", "showSessionExpiredDialog observed: $shouldShow")
+            if (shouldShow) {
+                showSessionExpiredDialog()
+                bookingViewModel.resetSessionExpiredState()
             }
         }
     }
 
+    private fun showSessionExpiredDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Session Expired")
+            .setMessage("Your session has expired. Please log in again.")
+            .setPositiveButton("Login") { _, _ ->
+                val intent = Intent(requireContext(), AutentikasiActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                startActivity(intent)
+            }
+            .setCancelable(false)
+            .show()
+    }
+
     private fun showLoading() {
         binding.progressBar.visibility = View.VISIBLE
-        Log.d("HistoryFragment", "Loading booking data...")
+        Log.d("Upcoming", "Loading booking data...")
     }
 
     private fun hideLoading() {
@@ -132,7 +155,7 @@ class UpcomingFragment : Fragment() {
     }
 
     private fun showError(message: String?) {
-        Log.e("HistoryFragment", "Error loading data: $message")
+        Log.e("UpcomingFragment", "Error loading data: $message")
         Toast.makeText(requireContext(), message ?: "Failed to load data", Toast.LENGTH_LONG).show()
     }
     override fun onDestroyView() {

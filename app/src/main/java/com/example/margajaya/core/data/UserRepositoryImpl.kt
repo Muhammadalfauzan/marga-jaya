@@ -76,9 +76,9 @@ class UserRepositoryImpl @Inject constructor(
         }.asFlow()
     }
 
-    override suspend fun updateUser(updateUserModel: UpdateUserModel): Resource<UpdateUserResponse> {
+    override suspend fun updateUser(updateUserRequest: UpdateUserModel): Resource<UpdateUserResponse> {
         return try {
-            val response = apiService.updateUser(updateUserModel)
+            val response = apiService.updateUser(updateUserRequest)
             if (response.success) {
                 Resource.Success(response)
             } else {

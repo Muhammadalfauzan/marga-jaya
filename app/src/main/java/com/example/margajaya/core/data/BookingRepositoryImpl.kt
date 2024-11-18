@@ -1,9 +1,6 @@
 package com.example.margajaya.core.data
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.example.margajaya.core.data.source.local.preferences.AuthPreferences
 import com.example.margajaya.core.data.source.remote.RemoteDataSource
 import com.example.margajaya.core.data.source.remote.network.ApiResponse
 import com.example.margajaya.core.data.source.remote.response.BookingResponse
@@ -43,7 +40,16 @@ class BookingRepositoryImpl @Inject constructor(
                         Resource.Success(bookingDataModels)
                     }
                     is Resource.Loading -> Resource.Loading()
-                    is Resource.Error -> Resource.Error(resource.message ?: "Unknown error")
+                    is Resource.Error -> {
+                        Log.d("BookingRepositoryImpl", "Error message from API: ${resource.message}")
+
+                        if (resource.message == "jwt expired") {
+                            Log.d("BookingRepositoryImpl", "Session expired detected in repository")
+                            Resource.Error("jwt expired")
+                        } else {
+                            Resource.Error(resource.message ?: "Unknown error")
+                        }
+                    }
                 }
             }
             .catch { e ->
