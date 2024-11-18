@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -18,9 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kamandanoe.AutentikasiActivity
-
 import com.example.kamandanoe.MainActivity
-import com.example.kamandanoe.R
 import com.example.kamandanoe.core.data.Resource
 import com.example.kamandanoe.core.domain.preferences.AuthPreferences
 import com.example.kamandanoe.core.utils.NetworkUtils
@@ -63,6 +60,10 @@ class HomeFragment : Fragment() {
         observeLapanganData()
         setupBottomNavigationView()
         setupSwipeRefresh()
+        setupDateAndSessionPickers()
+
+        binding.textViewDate.text = viewModel.pickerDate
+
     }
     private fun setupBottomNavigationView() {
         bottomNavigationView = (activity as MainActivity).binding.bottomNav
@@ -73,10 +74,10 @@ class HomeFragment : Fragment() {
             title = "Home" // Set judul sesuai kebutuhan
         }
 
-        // Akses tombol "btnDate" di Toolbar melalui MainActivity dan set OnClickListener
-        val btnDate = mainActivity.findViewById<ImageButton>(R.id.btn_date)
-        btnDate.visibility = View.VISIBLE
-        btnDate.setOnClickListener { showDatePicker() }
+//        // Akses tombol "btnDate" di Toolbar melalui MainActivity dan set OnClickListener
+//        val btnDate = mainActivity.findViewById<ImageButton>(R.id.btn_date)
+//        btnDate.visibility = View.VISIBLE
+//        btnDate.setOnClickListener { showDatePicker() }
     }
 
     private fun setupRecyclerView() {
@@ -148,7 +149,7 @@ class HomeFragment : Fragment() {
                 // Periksa koneksi sebelum mencoba memuat data lagi
                 if (networkUtils.isNetworkAvailable()) { // Menggunakan NetworkUtils yang diinject
                     // Jika koneksi tersedia, panggil ulang metode untuk fetch data
-                    val todayDate = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault()).format(Date())
+                    val todayDate = SimpleDateFormat("EEE,MMM dd yyyy", Locale.getDefault()).format(Date())
                     pickerDate = todayDate
                     viewModel.fetchLapanganData(pickerDate ?: "")
                 } else {
@@ -163,13 +164,17 @@ class HomeFragment : Fragment() {
 
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
-            // Set tanggal ke hari ini
+            // Set dan tampilkan tanggal hari ini di TextView
             val todayDate = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault()).format(Date())
             pickerDate = todayDate
+            binding.textViewDate.text = todayDate
 
-            // Refresh data saat swipe dengan tanggal hari ini
-            viewModel.fetchLapanganData(pickerDate ?: "")
 
+            // Perbarui tanggal di ViewModel agar sinkron dengan tampilan
+            viewModel.updatePickerDate(todayDate)
+
+            // Fetch data dengan tanggal yang diperbarui
+            viewModel.fetchLapanganData(todayDate)
             // Pantau perubahan data dan hentikan animasi setelah data di-load
             viewModel.lapangan.observe(viewLifecycleOwner) { resource ->
                 when (resource) {
@@ -192,6 +197,38 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun setupDateAndSessionPickers() {
+        setupDatePicker()
+    }
+
+    private fun setupDatePicker() {
+        binding.textViewDate.setOnClickListener { showDatePicker() }
+    }
+
+   /* private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                val selectedDate = Calendar.getInstance().apply {
+                    set(year, month, dayOfMonth)
+                }
+                pickerDate = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault()).format(selectedDate.time)
+                // Mengupdate TextView dengan tanggal yang dipilih
+                binding.textViewDate.text = pickerDate
+                viewModel.fetchLapanganData(pickerDate!!)
+                Toast.makeText(
+                    requireContext(),
+                    "Tanggal terpilih: $pickerDate",
+                    Toast.LENGTH_SHORT
+                ).show()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+*/
     override fun onPause() {
         super.onPause()
         // Hentikan animasi refresh ketika fragment ini kehilangan fokus
@@ -227,9 +264,13 @@ class HomeFragment : Fragment() {
                     set(year, month, dayOfMonth)
                 }
                 pickerDate = SimpleDateFormat(
-                    "EEE MMM dd yyyy",
+                    "EEE, MMM dd yyyy",
                     Locale.getDefault()
                 ).format(selectedDate.time)
+
+                val formattedDate = SimpleDateFormat("EEE, MMM dd yyyy", Locale.getDefault()).format(selectedDate.time)
+                viewModel.updatePickerDate(formattedDate)
+                binding.textViewDate.text = formattedDate
                 viewModel.fetchLapanganData(pickerDate!!) // Fetch data dengan tanggal yang dipilih
                 Toast.makeText(
                     requireContext(),

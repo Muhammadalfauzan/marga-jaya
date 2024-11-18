@@ -21,15 +21,16 @@ class HomeViewModel @Inject constructor(
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
+    var pickerDate: String = getCurrentDate() // Inisialisasi dengan tanggal hari ini secara default
     private val _lapangan = MutableLiveData<Resource<List<LapanganModel>>>()
     val lapangan: LiveData<Resource<List<LapanganModel>>> get() = _lapangan
 
     init {
-        fetchLapanganData(getCurrentDate())
+        fetchLapanganData(pickerDate) // Fetch data saat ViewModel dibuat
     }
 
     private fun getCurrentDate(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        return SimpleDateFormat("EEE,MMM dd yyyy", Locale.getDefault()).format(Date())
     }
 
     fun fetchLapanganData(tanggal: String) {
@@ -42,6 +43,11 @@ class HomeViewModel @Inject constructor(
         } else {
             _lapangan.value = Resource.Error("No internet connection")
         }
+    }
+
+    fun updatePickerDate(newDate: String) {
+        pickerDate = newDate
+        fetchLapanganData(newDate) // Update data berdasarkan tanggal yang baru
     }
 }
 

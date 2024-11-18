@@ -69,31 +69,45 @@
                             android:id="@+id/tvHello"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:padding="8dp"
                             android:text="@string/say_hello_home"
                             android:textColor="@android:color/black"
                             android:textSize="16sp"
-                            android:textAlignment="textStart"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/tv_nameHome" />
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/textViewDate"
+                        <!-- Date Picker Input -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/textInputLayoutDate"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:background="@drawable/bg_date"
-                            android:clickable="true"
-                            android:drawableStart="@drawable/ic_calender"
-                            android:focusable="false"
-                            android:drawablePadding="6dp"
-                            android:gravity="center_vertical"
-                            android:inputType="none"
-                            android:padding="12dp"
-                            android:text="Tanggal Hari Ini"
-                            android:textColor="@android:color/black"
+                            android:hint="Pilih Tanggal"
+                            app:endIconDrawable="@drawable/ic_calender"
+                            app:endIconMode="custom"
+                            app:layout_constraintEnd_toStartOf="@+id/imageView"
                             app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/tvHello">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/editTextDate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:focusable="false"
+                                android:inputType="none"
+                                android:padding="12dp"
+                                android:textColor="@android:color/black" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/imageView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/baseline_filter_list_24"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/tvHello" />
+
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
@@ -102,7 +116,6 @@
                     android:id="@+id/rv_homefrag"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cardViewFilter"
                     tools:listitem="@layout/item_home" />
 
 

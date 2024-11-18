@@ -22,7 +22,7 @@ class NoInternetBottomSheet(private val retryListener: OnRetryListener? = null) 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = TesBinding.inflate(inflater, container, false)
         return binding.root
     }

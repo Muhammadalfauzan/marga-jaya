@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
 
     // Fungsi untuk mengatur Toolbar berdasarkan ID destinasi
     private fun updateToolbar(destinationId: Int) {
-        setCalendarIconVisibility(destinationId)
+    //    setCalendarIconVisibility(destinationId)
         setToolbarTitle(destinationId)
         invalidateOptionsMenu()
     }
@@ -129,11 +129,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Fungsi untuk mengatur visibilitas ikon kalender
-    private fun setCalendarIconVisibility(destinationId: Int) {
-        binding.toolbar.findViewById<ImageButton>(R.id.btn_date).visibility =
-            if (destinationId == R.id.homeFragment) View.VISIBLE else View.GONE
-    }
+//    // Fungsi untuk mengatur visibilitas ikon kalender
+//    private fun setCalendarIconVisibility(destinationId: Int) {
+//        binding.toolbar.findViewById<ImageButton>(R.id.btn_date).visibility =
+//            if (destinationId == R.id.homeFragment) View.VISIBLE else View.GONE
+//    }
 
     // Fungsi untuk mengatur judul toolbar berdasarkan ID destinasi
     private fun setToolbarTitle(destinationId: Int) {
