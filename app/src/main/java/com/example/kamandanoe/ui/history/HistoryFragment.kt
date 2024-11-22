@@ -8,9 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.kamandanoe.AutentikasiActivity
+import com.example.kamandanoe.core.utils.NetworkMonitor
 import com.example.kamandanoe.databinding.FragmentHistoryBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HistoryFragment : Fragment() {
@@ -18,6 +20,10 @@ class HistoryFragment : Fragment() {
     private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
     private val bookingViewModel: BookingViewModel by viewModels()
+
+    @Inject
+    lateinit var networkMonitor: NetworkMonitor
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,7 +36,20 @@ class HistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViewPagerAndTabs()
 
-
+        // Observasi status jaringan
+        networkMonitor.networkStatus.observe(viewLifecycleOwner) { isConnected ->
+            if (isConnected) {
+                binding.ivNoInternet.visibility = View.GONE
+                binding.tvInfo.visibility = View.GONE
+                binding.pager.visibility = View.VISIBLE
+                binding.tabLayout.visibility = View.VISIBLE
+            } else {
+                binding.ivNoInternet.visibility = View.VISIBLE
+                binding.tvInfo.visibility = View.VISIBLE
+                binding.pager.visibility = View.GONE
+                binding.tabLayout.visibility = View.GONE
+            }
+        }
     }
 
     private fun setupViewPagerAndTabs() {

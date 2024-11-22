@@ -19,31 +19,33 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kamandanoe.AutentikasiActivity
 import com.example.kamandanoe.MainActivity
 import com.example.kamandanoe.core.data.Resource
+import com.example.kamandanoe.core.domain.model.LapanganModel
 import com.example.kamandanoe.core.domain.preferences.AuthPreferences
-import com.example.kamandanoe.core.utils.NetworkUtils
+import com.example.kamandanoe.core.utils.NetworkMonitor
+import com.example.kamandanoe.core.utils.RetryListener
 import com.example.kamandanoe.databinding.FragmentHomeBinding
-import com.example.kamandanoe.ui.autentikasi.NoInternetBottomSheet
-import com.example.kamandanoe.ui.callsback.OnRetryListener
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import nl.joery.animatedbottombar.AnimatedBottomBar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(),  SesiBottomSheetFragment.OnSessionSelectedListener{
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: HomeViewModel by viewModels()
+    val viewModel: HomeViewModel by viewModels()
     private lateinit var lapanganAdapter: AdapterHome
     private var pickerDate: String? = null
-    @Inject
-    lateinit var networkUtils: NetworkUtils
+
+@Inject
+lateinit var networkMonitor: NetworkMonitor
     @Inject
     lateinit var authPreferences: AuthPreferences
-    private lateinit var bottomNavigationView: AnimatedBottomBar
-
+    private lateinit var bottomNavigationView: BottomNavigationView
+    private var selectedSession: String = "Semua Sesi"
+    private var originalDataList = listOf<LapanganModel>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,37 +57,71 @@ class HomeFragment : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initializeUI()
+        observeLapanganData()
+
+        // Observasi status jaringan
+        networkMonitor.networkStatus.observe(viewLifecycleOwner) { isConnected ->
+            if (!isConnected) {
+                // Tampilkan BottomSheet jika tidak ada koneksi
+                showNoInternetBottomSheet()
+            }
+        }
+    }
+
+    private fun initializeUI() {
         setupTopBar()
         setupRecyclerView()
-        observeLapanganData()
         setupBottomNavigationView()
         setupSwipeRefresh()
         setupDateAndSessionPickers()
-
         binding.textViewDate.text = viewModel.pickerDate
-
+        setupObservers()
+        setupSessionPicker()
     }
-    private fun setupBottomNavigationView() {
-        bottomNavigationView = (activity as MainActivity).binding.bottomNav
+
+    private fun showNoInternetBottomSheet() {
+        val noInternetBottomSheet = NoInternetBottomSheet(object : RetryListener {
+            override fun onRetry() {
+                // Panggil ulang fetch data saat tombol Retry ditekan
+                viewModel.fetchLapanganData(viewModel.pickerDate)
+            }
+        }, isNetworkAvailable = { isNetworkConnected() })
+        noInternetBottomSheet.show(parentFragmentManager, "NoInternetBottomSheet")
+    }
+
+    private fun isNetworkConnected(): Boolean {
+        // Gunakan networkMonitor atau NetworkUtils untuk mengecek koneksi
+        return networkMonitor.networkStatus.value == true
+    }
+
+    private fun setupObservers() {
+        viewModel.selectedSession.observe(viewLifecycleOwner) { session ->
+            binding.textViewSesi.text = session
+        }
+    }
+
+    private fun setupSessionPicker() {
+        binding.textViewSesi.setOnClickListener {
+            val bottomSheet = SesiBottomSheetFragment()
+            bottomSheet.show(childFragmentManager, "SessionBottomSheet")
+        }
+    }
+    override fun onSessionSelected(session: String) {
+        viewModel.updateSelectedSession(session)
     }
     private fun setupTopBar() {
-        val mainActivity = activity as AppCompatActivity // Pastikan ada id topBar di FragmentHomeBinding
+        val mainActivity = activity as AppCompatActivity
         mainActivity.supportActionBar?.apply {
-            title = "Home" // Set judul sesuai kebutuhan
+            title = "Home"
         }
-
-//        // Akses tombol "btnDate" di Toolbar melalui MainActivity dan set OnClickListener
-//        val btnDate = mainActivity.findViewById<ImageButton>(R.id.btn_date)
-//        btnDate.visibility = View.VISIBLE
-//        btnDate.setOnClickListener { showDatePicker() }
     }
 
     private fun setupRecyclerView() {
         binding.rvHomefrag.layoutManager = LinearLayoutManager(requireContext())
         lapanganAdapter = AdapterHome { lapangan ->
-            navigateToDetailFragment(lapangan.id, pickerDate ?: "")
-            Toast.makeText(requireContext(), "Detail ${lapangan.jenisLapangan}", Toast.LENGTH_SHORT)
-                .show()
+            navigateToDetailFragment(lapangan.id, viewModel.pickerDate)
+            Toast.makeText(requireContext(), "Detail ${lapangan.jenisLapangan}", Toast.LENGTH_SHORT).show()
         }
         binding.rvHomefrag.adapter = lapanganAdapter
         setupRecyclerViewScrollListener()
@@ -94,27 +130,21 @@ class HomeFragment : Fragment() {
     private fun setupRecyclerViewScrollListener() {
         binding.rvHomefrag.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
                 handleBottomNavigationVisibility(dy)
             }
         })
     }
 
     private fun handleBottomNavigationVisibility(dy: Int) {
-        if (dy > 0 && bottomNavigationView.translationY == 0f) {
-            // Scroll ke bawah - geser BottomNavigationView keluar dari layar
-            bottomNavigationView.animate()
-                .translationY(bottomNavigationView.height.toFloat())
-                .setDuration(200)
-                .start()
-        } else if (dy < 0 && bottomNavigationView.translationY == bottomNavigationView.height.toFloat()) {
-            // Scroll ke atas - kembalikan BottomNavigationView ke posisi semula
-            bottomNavigationView.animate()
-                .translationY(0f)
-                .setDuration(200)
-                .start()
+        if (::bottomNavigationView.isInitialized) {
+            if (dy > 0 && bottomNavigationView.translationY == 0f) {
+                bottomNavigationView.animate().translationY(bottomNavigationView.height.toFloat()).setDuration(200).start()
+            } else if (dy < 0 && bottomNavigationView.translationY == bottomNavigationView.height.toFloat()) {
+                bottomNavigationView.animate().translationY(0f).setDuration(200).start()
+            }
         }
     }
+
     override fun onResume() {
         super.onResume()
         bottomNavigationView.viewTreeObserver.addOnGlobalLayoutListener {
@@ -122,80 +152,11 @@ class HomeFragment : Fragment() {
         }
     }
 
-
-    private fun observeLapanganData() {
-        viewModel.lapangan.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Loading -> showLoadingIndicator()
-                is Resource.Success -> {
-                    hideLoadingIndicator()
-                    lapanganAdapter.submitList(resource.data)
-                }
-
-                is Resource.Error -> {
-                    hideLoadingIndicator()
-                    if (resource.message == "No internet connection") {
-                        showNoInternetDialog()
-                    } else {
-                        showError(resource.message)
-                    }
-                }
-            }
-        }
-    }
-    private fun showNoInternetDialog() {
-        val noInternetBottomSheet = NoInternetBottomSheet(object : OnRetryListener {
-            override fun onRetry() {
-                // Periksa koneksi sebelum mencoba memuat data lagi
-                if (networkUtils.isNetworkAvailable()) { // Menggunakan NetworkUtils yang diinject
-                    // Jika koneksi tersedia, panggil ulang metode untuk fetch data
-                    val todayDate = SimpleDateFormat("EEE,MMM dd yyyy", Locale.getDefault()).format(Date())
-                    pickerDate = todayDate
-                    viewModel.fetchLapanganData(pickerDate ?: "")
-                } else {
-                    // Tampilkan dialog atau feedback lain jika koneksi masih belum ada
-                    Toast.makeText(requireContext(), "Tidak ada koneksi internet. Coba lagi.", Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
-        noInternetBottomSheet.show(childFragmentManager, NoInternetBottomSheet.TAG)
+    private fun setupBottomNavigationView() {
+        val mainActivity = activity as MainActivity
+        bottomNavigationView = mainActivity.binding.bottomNavigationView
     }
 
-
-    private fun setupSwipeRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            // Set dan tampilkan tanggal hari ini di TextView
-            val todayDate = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault()).format(Date())
-            pickerDate = todayDate
-            binding.textViewDate.text = todayDate
-
-
-            // Perbarui tanggal di ViewModel agar sinkron dengan tampilan
-            viewModel.updatePickerDate(todayDate)
-
-            // Fetch data dengan tanggal yang diperbarui
-            viewModel.fetchLapanganData(todayDate)
-            // Pantau perubahan data dan hentikan animasi setelah data di-load
-            viewModel.lapangan.observe(viewLifecycleOwner) { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        // Tampilkan animasi jika data sedang di-load
-                        binding.swipeRefreshLayout.isRefreshing = true
-                    }
-                    is Resource.Success -> {
-                        // Hentikan animasi saat data selesai di-load
-                        binding.swipeRefreshLayout.isRefreshing = false
-                        lapanganAdapter.submitList(resource.data)
-                    }
-                    is Resource.Error -> {
-                        // Hentikan animasi saat ada error
-                        binding.swipeRefreshLayout.isRefreshing = false
-                        showError(resource.message)
-                    }
-                }
-            }
-        }
-    }
 
     private fun setupDateAndSessionPickers() {
         setupDatePicker()
@@ -205,7 +166,7 @@ class HomeFragment : Fragment() {
         binding.textViewDate.setOnClickListener { showDatePicker() }
     }
 
-   /* private fun showDatePicker() {
+    private fun showDatePicker() {
         val calendar = Calendar.getInstance()
         DatePickerDialog(
             requireContext(),
@@ -213,22 +174,58 @@ class HomeFragment : Fragment() {
                 val selectedDate = Calendar.getInstance().apply {
                     set(year, month, dayOfMonth)
                 }
-                pickerDate = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault()).format(selectedDate.time)
-                // Mengupdate TextView dengan tanggal yang dipilih
-                binding.textViewDate.text = pickerDate
-                viewModel.fetchLapanganData(pickerDate!!)
-                Toast.makeText(
-                    requireContext(),
-                    "Tanggal terpilih: $pickerDate",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val formattedDate = SimpleDateFormat("EEE, MMM dd yyyy", Locale.getDefault()).format(selectedDate.time)
+                viewModel.updatePickerDate(formattedDate)
+                binding.textViewDate.text = formattedDate
+                // Tampilkan shimmer saat tanggal dipilih
+                showLoadingIndicator()
+                viewModel.fetchLapanganData(formattedDate)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ).show()
     }
-*/
+
+    private fun observeLapanganData() {
+        viewModel.lapangan.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> showLoadingIndicator()
+                is Resource.Success -> {
+                    hideLoadingIndicator()
+                    lapanganAdapter.submitList(resource.data)
+                }
+                is Resource.Error -> {
+                    hideLoadingIndicator()
+                   // handleError(resource.message)
+                }
+            }
+        }
+    }
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            val todayDate = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault()).format(Date())
+            viewModel.updatePickerDate(todayDate)
+            binding.textViewDate.text = todayDate
+            // Tampilkan shimmer saat melakukan refresh
+            showLoadingIndicator()
+            viewModel.fetchLapanganData(todayDate)
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
+    }
+
+    private fun showLoadingIndicator() {
+        binding.progressBarShimmer.startShimmer()
+        binding.progressBarShimmer.visibility = View.VISIBLE
+        binding.rvHomefrag.visibility = View.GONE
+    }
+
+    private fun hideLoadingIndicator() {
+        binding.progressBarShimmer.stopShimmer()
+        binding.progressBarShimmer.visibility = View.GONE
+        binding.rvHomefrag.visibility = View.VISIBLE
+    }
+
     override fun onPause() {
         super.onPause()
         // Hentikan animasi refresh ketika fragment ini kehilangan fokus
@@ -241,49 +238,11 @@ class HomeFragment : Fragment() {
         binding.swipeRefreshLayout.isRefreshing = false
     }
 
-    private fun showLoadingIndicator() {
-        binding.progressBar.visibility = View.VISIBLE
-        Log.d("HomeFragment", "Fetching lapangan data...")
-    }
-
-    private fun hideLoadingIndicator() {
-        binding.progressBar.visibility = View.GONE
-    }
-
     private fun showError(message: String?) {
         Log.e("HomeFragment", "Error fetching lapangan data: $message")
         Toast.makeText(requireContext(), "Error: $message", Toast.LENGTH_SHORT).show()
     }
 
-    private fun showDatePicker() {
-        val calendar = Calendar.getInstance()
-        val datePickerDialog = DatePickerDialog(
-            requireContext(),
-            { _, year, month, dayOfMonth ->
-                val selectedDate = Calendar.getInstance().apply {
-                    set(year, month, dayOfMonth)
-                }
-                pickerDate = SimpleDateFormat(
-                    "EEE, MMM dd yyyy",
-                    Locale.getDefault()
-                ).format(selectedDate.time)
-
-                val formattedDate = SimpleDateFormat("EEE, MMM dd yyyy", Locale.getDefault()).format(selectedDate.time)
-                viewModel.updatePickerDate(formattedDate)
-                binding.textViewDate.text = formattedDate
-                viewModel.fetchLapanganData(pickerDate!!) // Fetch data dengan tanggal yang dipilih
-                Toast.makeText(
-                    requireContext(),
-                    "Tanggal terpilih: $pickerDate",
-                    Toast.LENGTH_SHORT
-                ).show()
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
-        datePickerDialog.show()
-    }
 
     private fun navigateToDetailFragment(id: String, tanggal: String) {
         val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(id, tanggal)
@@ -315,4 +274,5 @@ class HomeFragment : Fragment() {
     private fun handleAdminAction() {
         Toast.makeText(requireContext(), "Admin clicked", Toast.LENGTH_SHORT).show()
     }
+
 }

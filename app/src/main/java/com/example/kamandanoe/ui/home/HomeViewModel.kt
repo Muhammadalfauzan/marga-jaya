@@ -1,5 +1,6 @@
 package com.example.kamandanoe.ui.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,38 +19,70 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val lapanganUseCase: LapanganUseCase,
-    private val networkUtils: NetworkUtils
+   // private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
-    var pickerDate: String = getCurrentDate() // Inisialisasi dengan tanggal hari ini secara default
+    var pickerDate: String = getCurrentDate()
     private val _lapangan = MutableLiveData<Resource<List<LapanganModel>>>()
     val lapangan: LiveData<Resource<List<LapanganModel>>> get() = _lapangan
 
+    private val _selectedSession = MutableLiveData("Semua Sesi")
+    val selectedSession: LiveData<String> get() = _selectedSession
+
+    private val _originalDataList = MutableLiveData<List<LapanganModel>>()
+    val originalDataList: LiveData<List<LapanganModel>> get() = _originalDataList
+
     init {
-        fetchLapanganData(pickerDate) // Fetch data saat ViewModel dibuat
+        fetchLapanganData(pickerDate)
     }
 
     private fun getCurrentDate(): String {
-        return SimpleDateFormat("EEE,MMM dd yyyy", Locale.getDefault()).format(Date())
+        return SimpleDateFormat("EEE, MMM dd yyyy", Locale.getDefault()).format(Date())
     }
 
     fun fetchLapanganData(tanggal: String) {
-        if (networkUtils.isNetworkAvailable()) {
-            viewModelScope.launch {
-                lapanganUseCase.getLapangan(tanggal).collect { resource ->
-                    _lapangan.value = resource
+        _lapangan.postValue(Resource.Loading())
+        resetSessionFilter()
+        viewModelScope.launch {
+            lapanganUseCase.getLapangan(tanggal).collect { resource ->
+                _lapangan.postValue(resource)
+                if (resource is Resource.Success) {
+                    val data = resource.data ?: emptyList()
+                    _originalDataList.postValue(data)
+                } else if (resource is Resource.Error) {
+                    _originalDataList.postValue(emptyList())
                 }
             }
-        } else {
-            _lapangan.value = Resource.Error("No internet connection")
         }
     }
 
     fun updatePickerDate(newDate: String) {
         pickerDate = newDate
-        fetchLapanganData(newDate) // Update data berdasarkan tanggal yang baru
+        fetchLapanganData(newDate)
+    }
+
+    fun updateSelectedSession(session: String) {
+        _selectedSession.value = session
+        applySessionFilter(session)
+    }
+
+
+    private fun applySessionFilter(session: String) {
+        val dataList = _originalDataList.value.orEmpty()
+        val filteredData = if (session == "Semua Sesi") {
+            dataList
+        } else {
+            val sessionStartTime = session.split(" - ").first().trim()
+            dataList.filter { it.jamMulai.trim() == sessionStartTime }
+        }
+        _lapangan.postValue(Resource.Success(filteredData))
+    }
+
+    fun resetSessionFilter() {
+        _selectedSession.value = "Semua Sesi"
     }
 }
+
 
 // Langsung mengonversi Flow menjadi LiveData
 //val lapangan = lapanganUseCase.getLapangan("2024-10-31").asLiveData()

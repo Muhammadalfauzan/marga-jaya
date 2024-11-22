@@ -1,18 +1,23 @@
 package com.example.kamandanoe
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.Gravity
 import android.view.Menu
 import android.view.View
-import android.widget.ImageButton
+import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupWithNavController
 import com.example.kamandanoe.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import dagger.hilt.android.AndroidEntryPoint
-import nl.joery.animatedbottombar.AnimatedBottomBar
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -23,119 +28,117 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Set up Toolbar sebagai ActionBar
+        // Setup Toolbar
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        // Setup Navigation
         setupNavigation()
-
-        // Override tombol back pada device dengan OnBackPressedCallback
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                val navController = findNavController(R.id.nav_host_fragment)
-                val currentDestinationId = navController.currentDestination?.id
-
-                when (currentDestinationId) {
-                    R.id.detailFragment -> {
-                        // Jika berada di detailFragment, navigasikan kembali ke home
-                        navController.navigateUp() // Menggunakan navigateUp akan kembali ke fragment sebelumnya (yaitu, home)
-                    }
-                    R.id.buktiFragment ->{
-                        navController.navigateUp()
-                    }
-                    R.id.historyFragment, R.id.profileFragment -> {
-                        // Jika berada di history atau profile, navigasikan kembali ke home
-                        navController.popBackStack(R.id.homeFragment, false)
-                    }
-                    else -> {
-                        // Jika sudah di home atau tidak ada fragment sebelumnya, keluar aplikasi
-                        finish()
-                    }
-                }
-            }
-        })
     }
 
     private fun setupNavigation() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navHostFragment = binding.navHostFragment.getFragment<NavHostFragment>()
+
         val navController = navHostFragment.navController
 
-        // Listener untuk perubahan tab di AnimatedBottomBar
-        binding.bottomNav.setOnTabSelectListener(object : AnimatedBottomBar.OnTabSelectListener {
-            override fun onTabSelected(lastIndex: Int, lastTab: AnimatedBottomBar.Tab?, newIndex: Int, newTab: AnimatedBottomBar.Tab) {
-                when (newTab.id) {
-                    R.id.homeFragment -> navigateToFragment(navController, R.id.homeFragment)
-                    R.id.historyFragment -> navigateToFragment(navController, R.id.historyFragment)
-                    R.id.profileFragment -> navigateToFragment(navController, R.id.profileFragment)
-                }
-            }
+        // Connect BottomNavigationView to NavController
+        binding.bottomNavigationView.setupWithNavController(navController)
 
-            override fun onTabReselected(index: Int, tab: AnimatedBottomBar.Tab) {
-                // Optional: Handle tab reselection here if needed
-            }
-        })
+        // Setup navigation indicator for BottomNavigationView
+        setupNavigationIndicator(navController)
 
-        // Listener untuk setiap perubahan destinasi
+        // Handle navigation destination changes
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            updateBottomNavVisibility(destination.id)
             updateToolbar(destination.id)
-            syncBottomNavWithDestination(destination.id)
         }
     }
 
-   /* private fun navigateBackToHome() {
-        val navController = findNavController(R.id.nav_host_fragment)
-        val currentDestinationId = navController.currentDestination?.id
-        if (currentDestinationId == R.id.historyFragment || currentDestinationId == R.id.profileFragment) {
-            // Jika berada di history atau profile, kembali ke home
-            navigateToFragment(navController, R.id.homeFragment)
-        } else {
-            // Jika sudah di home atau fragment lain, lakukan back biasa
-            finish()
+    @SuppressLint("RestrictedApi")
+    private fun setupNavigationIndicator(navController: NavController) {
+        // Parent BottomNavigationView
+        val menuView = binding.bottomNavigationView.getChildAt(0) as BottomNavigationMenuView
+
+        // Listener untuk memperbarui indikator pada item yang diklik
+        binding.bottomNavigationView.setOnItemSelectedListener { menuItem ->
+            val index = getMenuItemIndex(menuItem.itemId)
+            updateIndicator(index, menuView)
+            NavigationUI.onNavDestinationSelected(menuItem, navController)
+            true
         }
-    }*/
 
-    private fun navigateToFragment(navController: NavController, destinationId: Int) {
-        val currentDestination = navController.currentDestination?.id
+        // Listener untuk menyinkronkan indikator saat fragment berubah
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            val index = getMenuItemIndex(destination.id)
+            updateIndicator(index, menuView)
+        }
 
-        if (currentDestination != destinationId) {
-            // Pop back stack to prevent recreating home fragment multiple times
-            if (destinationId == R.id.homeFragment) {
-                navController.popBackStack(R.id.homeFragment, false)
-            } else {
-                navController.navigate(destinationId)
+        // Menetapkan indikator default (item pertama)
+        val defaultIndex = getMenuItemIndex(navController.currentDestination?.id ?: -1)
+        updateIndicator(defaultIndex, menuView)
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun updateIndicator(index: Int, menuView: BottomNavigationMenuView) {
+        // Menghapus indikator dari semua item
+        for (i in 0 until menuView.childCount) {
+            val itemView = menuView.getChildAt(i) as BottomNavigationItemView
+            val indicator = itemView.findViewById<View>(R.id.nav_indicator)
+            indicator?.let { itemView.removeView(it) }
+        }
+
+        // Menambahkan indikator pada item yang dipilih
+        if (index in 0 until menuView.childCount) {
+            val selectedItemView = menuView.getChildAt(index) as BottomNavigationItemView
+            val indicatorView = View(this).apply {
+                id = R.id.nav_indicator
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, // Lebar indikator sesuai item
+                    10.dp // Total tinggi (garis + bayangan)
+                ).apply {
+                    gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL // Muncul di atas ikon menu
+                    topMargin = -6.dp // Atur jarak agar sedikit di atas ikon
+                }
+                setBackgroundResource(R.drawable.nav_indikator_home) // Mengatur background ripple
+            }
+            selectedItemView.addView(indicatorView)
+        }
+    }
+
+    // Fungsi untuk mendapatkan indeks item berdasarkan ID
+    private fun getMenuItemIndex(itemId: Int): Int {
+        for (i in 0 until binding.bottomNavigationView.menu.size()) {
+            if (binding.bottomNavigationView.menu.getItem(i).itemId == itemId) {
+                return i
             }
         }
+        return -1 // Jika item tidak ditemukan
     }
 
-    // Fungsi untuk mengatur visibilitas AnimatedBottomBar
+    // Ekstensi untuk konversi dp ke px
+    private val Int.dp: Int
+        get() = (this * resources.displayMetrics.density).toInt()
+
+    // Update visibility of BottomNavigationView
     private fun updateBottomNavVisibility(destinationId: Int) {
-        val shouldHide = destinationId.shouldHideBottomNav()
-        binding.bottomNav.visibility = if (shouldHide) View.GONE else View.VISIBLE
+        binding.bottomNavigationView.visibility = if (destinationId.shouldHideBottomNav()) View.GONE else View.VISIBLE
     }
 
-    // Fungsi untuk mengatur Toolbar berdasarkan ID destinasi
+    // Update Toolbar for specific destination
     private fun updateToolbar(destinationId: Int) {
-    //    setCalendarIconVisibility(destinationId)
         setToolbarTitle(destinationId)
         invalidateOptionsMenu()
     }
 
-    // Fungsi untuk menyinkronkan AnimatedBottomBar dengan fragment yang sedang ditampilkan
+    // Synchronize BottomNavigationView with current fragment
     private fun syncBottomNavWithDestination(destinationId: Int) {
         when (destinationId) {
-            R.id.homeFragment -> binding.bottomNav.selectTabAt(0)
-            R.id.historyFragment -> binding.bottomNav.selectTabAt(1)
-            R.id.profileFragment -> binding.bottomNav.selectTabAt(2)
+            R.id.homeFragment -> binding.bottomNavigationView.selectedItemId = R.id.homeFragment
+            R.id.historyFragment -> binding.bottomNavigationView.selectedItemId = R.id.historyFragment
+            R.id.profileFragment -> binding.bottomNavigationView.selectedItemId = R.id.profileFragment
         }
     }
 
-//    // Fungsi untuk mengatur visibilitas ikon kalender
-//    private fun setCalendarIconVisibility(destinationId: Int) {
-//        binding.toolbar.findViewById<ImageButton>(R.id.btn_date).visibility =
-//            if (destinationId == R.id.homeFragment) View.VISIBLE else View.GONE
-//    }
-
-    // Fungsi untuk mengatur judul toolbar berdasarkan ID destinasi
+    // Set Toolbar title based on destination ID
     private fun setToolbarTitle(destinationId: Int) {
         val title = when (destinationId) {
             R.id.homeFragment -> "Home"
@@ -162,18 +165,17 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val destinationId = findNavController(R.id.nav_host_fragment).currentDestination?.id
-        if (destinationId != null) {
-            updateBottomNavVisibility(destinationId)
-        }
+        destinationId?.let { updateBottomNavVisibility(it) }
     }
 
-    // Fungsi ekstensi untuk menentukan apakah BottomNavigationView harus disembunyikan
+    // Extension function to check if BottomNavigationView should be hidden
     private fun Int.shouldHideBottomNav(): Boolean {
         return this == R.id.detailFragment || this == R.id.buktiFragment
     }
 
-    // Fungsi ekstensi untuk menentukan apakah menu toolbar harus ditampilkan
+    // Extension function to check if toolbar menu should be shown
     private fun Int?.shouldShowMenu(): Boolean {
         return this == R.id.homeFragment || this == R.id.historyFragment
     }
+
 }

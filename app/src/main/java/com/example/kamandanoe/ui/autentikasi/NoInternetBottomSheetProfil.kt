@@ -14,7 +14,7 @@ import com.example.kamandanoe.databinding.TesBinding
 import com.example.kamandanoe.ui.callsback.OnRetryListener
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class NoInternetBottomSheet(private val retryListener: OnRetryListener? = null) : BottomSheetDialogFragment() {
+class NoInternetBottomSheetProfil(private val retryListener: OnRetryListener? = null) : BottomSheetDialogFragment() {
 
     private var _binding: TesBinding? = null
     private val binding get() = _binding!!

@@ -38,4 +38,8 @@
         <string name="error_default_message">An error occurred. Please try again later.</string>
 
         <string name="say_hello_home">Booking lapangan jadi lebih gampang di Kamandanoe </string>
+
+    <string name="image_description">Image</string>
+    <string name="jenis_lap">Jenis Lapangan</string>
+
 </resources>

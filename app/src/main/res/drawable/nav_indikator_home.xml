@@ -1,0 +1,13 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Garis utama -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/holo_blue_dark" />
+            <size android:height="4dp" />
+            <!-- Tambahkan corner radius -->
+            <corners android:radius="12dp" /> <!-- Atur radius sesuai kebutuhan -->
+        </shape>
+    </item>
+
+</layer-list>
+

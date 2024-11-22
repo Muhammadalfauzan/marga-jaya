@@ -89,6 +89,7 @@ android {
         implementation(libs.lifecycle.livedata.ktx)
         implementation(libs.androidx.lifecycle.lifecycle.viewmodel.ktx)
 
+        implementation ("com.facebook.shimmer:shimmer:0.5.0")
         implementation(libs.androidx.room.runtime)
         ksp(libs.androidx.room.compiler)
         implementation(libs.androidx.room.ktx)
@@ -96,4 +97,7 @@ android {
         implementation(libs.hilt.android)
         ksp(libs.hilt.android.compiler)
     }
+}
+dependencies {
+    implementation(libs.material)
 }

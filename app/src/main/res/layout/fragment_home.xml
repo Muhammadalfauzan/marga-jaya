@@ -1,123 +1,172 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- SwipeRefreshLayout untuk fungsi refresh -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- NestedScrollView untuk konten yang dapat digulir -->
         <androidx.core.widget.NestedScrollView
-            android:id="@+id/nestedScroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/toolbar"
-            android:descendantFocusability="beforeDescendants"
-            android:fillViewport="true"
-            android:paddingBottom="16dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
+            android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                >
 
-
-                <!-- CardView Container -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardViewFilter"
+                <!-- Bagian Header -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/headerLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-
-                    app:cardElevation="8dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_height="160dp"
+                    android:background="@drawable/bg_bulu"
+                    android:padding="16dp"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="16dp">
-                        <!-- User Greeting Text -->
-                        <TextView
-                            android:id="@+id/textView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Hello!"
-                            android:textColor="@android:color/black"
-                            android:textSize="18sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Hello!"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                        <!-- User Name Text -->
-                        <TextView
-                            android:id="@+id/tv_nameHome"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Fauzann"
-                            android:textColor="@android:color/black"
-                            android:textSize="18sp"
-                            app:layout_constraintStart_toEndOf="@+id/textView"
-                            app:layout_constraintTop_toTopOf="@+id/textView" />
+                    <TextView
+                        android:id="@+id/tv_nameHome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginStart="8dp"
+                        android:text="Fauzann"
+                        android:textSize="20sp"
+                        app:layout_constraintBaseline_toBaselineOf="@id/textView"
+                        app:layout_constraintStart_toEndOf="@id/textView" />
 
-                        <!-- Secondary Greeting or Instruction Text -->
-                        <TextView
-                            android:id="@+id/tvHello"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:text="@string/say_hello_home"
-                            android:textColor="@android:color/black"
-                            android:textSize="16sp"
-                            android:textAlignment="textStart"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/tv_nameHome" />
+                    <TextView
+                        android:id="@+id/tvHello"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/say_hello_home"
+                        android:textAlignment="textStart"
+                        android:textSize="16sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/textViewDate"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:background="@drawable/bg_date"
-                            android:clickable="true"
-                            android:drawableStart="@drawable/ic_calender"
-                            android:focusable="false"
-                            android:drawablePadding="6dp"
-                            android:gravity="center_vertical"
-                            android:inputType="none"
-                            android:padding="12dp"
-                            android:text="Tanggal Hari Ini"
-                            android:textColor="@android:color/black"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/tvHello" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- CardView untuk memilih tanggal -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardViewDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="140dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="20dp"
+                    app:layout_constraintEnd_toStartOf="@+id/cardViewSesi"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/headerLayout">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/textViewDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_calender"
+                        android:drawablePadding="8dp"
+                        android:padding="12dp"
+                        android:text="Tanggal Hari Ini"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
                 </androidx.cardview.widget.CardView>
 
-                <!-- RecyclerView -->
+                <!-- CardView untuk memilih sesi -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardViewSesi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/cardViewDate">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/textViewSesi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableEnd="@drawable/baseline_keyboard_arrow_down_24"
+                        android:drawablePadding="8dp"
+                        android:padding="12dp"
+                        android:text="Semua Sesi"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- RecyclerView untuk daftar -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_homefrag"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewDate"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:listitem="@layout/item_list_lapangan" />
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/progress_barShimmer"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cardViewFilter"
-                    tools:listitem="@layout/item_home" />
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="@+id/rv_homefrag"
+                    app:shimmer_auto_start="true">
 
+                    <ScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <include layout="@layout/place_holder_item_home" />
+
+                            <include layout="@layout/place_holder_item_home" />
+
+                            <include layout="@layout/place_holder_item_home" />
+
+                            <include layout="@layout/place_holder_item_home" />
+                        </LinearLayout>
+                    </ScrollView>
+                </com.facebook.shimmer.ShimmerFrameLayout>
+                <!-- ProgressBar untuk loading -->
                 <ProgressBar
                     android:id="@+id/progressBar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

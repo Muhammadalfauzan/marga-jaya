@@ -92,7 +92,7 @@ class DetailFragment : Fragment() {
     }
 
     private fun toggleBottomNavVisibility(visibility: Int) {
-        val bottomNav = requireActivity().findViewById<View>(R.id.bottom_nav)
+        val bottomNav = requireActivity().findViewById<View>(R.id.bottomNavigationView)
         bottomNav.visibility = visibility
     }
 

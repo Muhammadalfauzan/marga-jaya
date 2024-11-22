@@ -10,13 +10,14 @@ import com.bumptech.glide.Glide
 import com.example.kamandanoe.R
 import com.example.kamandanoe.core.domain.model.LapanganModel
 import com.example.kamandanoe.databinding.ItemHomeBinding
+import com.example.kamandanoe.databinding.ItemListLapanganBinding
 
 class AdapterHome(
     private val onItemClick: (LapanganModel) -> Unit // Fungsi untuk menangani klik item
 ) : ListAdapter<LapanganModel, AdapterHome.LapanganViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LapanganViewHolder {
-        val binding = ItemHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemListLapanganBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return LapanganViewHolder(binding)
     }
 
@@ -25,7 +26,7 @@ class AdapterHome(
         holder.bind(lapangan)
     }
 
-    inner class LapanganViewHolder(private val binding: ItemHomeBinding) :
+    inner class LapanganViewHolder(private val binding: ItemListLapanganBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(lapangan: LapanganModel) {
@@ -34,7 +35,7 @@ class AdapterHome(
                 .load(lapangan.imageUrls.firstOrNull()) // Mengambil URL gambar pertama
                 .placeholder(R.color.primary)
                 .centerCrop()// Placeholder saat loading
-                .into(binding.ivHomefrag)
+                .into(binding.ivItemImage)
 
             binding.tvStatushomefrag.text = if (lapangan.available) "TERSEDIA" else "TIDAK TERSEDIA"
             binding.tvJenishomefrag.text = lapangan.jenisLapangan

@@ -17,10 +17,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kamandanoe.AutentikasiActivity
 import com.example.kamandanoe.core.data.Resource
 import com.example.kamandanoe.core.domain.model.BookingItemModel
+import com.example.kamandanoe.core.utils.NetworkMonitor
 import com.example.kamandanoe.databinding.FragmentFinishedBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -29,6 +31,8 @@ class UpcomingFragment : Fragment() {
     private var _binding: FragmentFinishedBinding? = null
     private val binding get() = _binding!!
     private val bookingViewModel: BookingViewModel by viewModels({ requireParentFragment() })
+    @Inject
+    lateinit var networkStatusListener: NetworkMonitor
     // Adapter dengan click listener untuk navigasi
     private val adapterBooking by lazy {
         AdapterBooking { bookingItem ->
@@ -46,13 +50,25 @@ class UpcomingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecyclerView()
-        observeViewModel()
-        if (bookingViewModel.upcomingBookings.value == null) {
-            bookingViewModel.getAllBookings() // Panggil jika belum ada data
+
+        networkStatusListener.networkStatus.observe(viewLifecycleOwner) { isConnected ->
+            if (isConnected) {
+                setupRecyclerView()
+                observeViewModel()
+                if (bookingViewModel.upcomingBookings.value == null) {
+                    bookingViewModel.getAllBookings() // Panggil jika belum ada data
+                }
+            } else {
+                showNoInternetMessage()
+            }
+
         }
 
     }
+    private fun showNoInternetMessage() {
+        Toast.makeText(requireContext(), "Tidak ada koneksi internet", Toast.LENGTH_SHORT).show()
+    }
+
     private fun navigateToDetail(bookingItem: BookingItemModel) {
         // Periksa status pembayaran
         if (bookingItem.status == "success") {
