@@ -20,7 +20,7 @@ class FinishedFragment : Fragment() {
     private var _binding: FragmentFinishedBinding? = null
     private val binding get() = _binding!!
     private val bookingViewModel: BookingViewModel by viewModels({ requireParentFragment() })
-    private val adapterBooking by lazy { AdapterBooking { /* handle item click */ } }
+    private val adapterBooking by lazy { AdapterBooking(requireContext()) { /* handle item click */ } }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

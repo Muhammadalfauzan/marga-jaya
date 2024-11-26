@@ -24,6 +24,7 @@ class UserInteractor @Inject constructor(
     override suspend fun clearProfileCache() {
         profileRepository.clearProfileCache()  // Panggil ke repository untuk menghapus data
     }
+
    /* override suspend fun updateProfile(profileModel: ProfileModel): Flow<Resource<ProfileModel>> {
         return profileRepository.updateProfile(profileModel)
     }*/

@@ -147,9 +147,9 @@ lateinit var networkMonitor: NetworkMonitor
 
     override fun onResume() {
         super.onResume()
-        bottomNavigationView.viewTreeObserver.addOnGlobalLayoutListener {
-            bottomNavigationView.translationY = 0f
-        }
+
+        // Pastikan toolbar sesuai dengan konteks fragment
+        setupTopBar()
     }
 
     private fun setupBottomNavigationView() {

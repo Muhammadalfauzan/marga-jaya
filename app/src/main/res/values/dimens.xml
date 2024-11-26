@@ -1,0 +1,4 @@
+<resources>
+    <!-- Define height for navigation indicator -->
+    <dimen name="nav_indicator_height">4dp</dimen>
+</resources>

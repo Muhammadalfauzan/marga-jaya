@@ -25,6 +25,10 @@ class LocalDataSource @Inject constructor(private val lapanganDao: LapanganDao, 
     suspend fun insertProfile(profile: UserProfileEntity) {
         userDao.insertProfile(profile)
     }
+    // Fungsi untuk memperbarui profil yang ada
+    suspend fun updateProfile(profile: UserProfileEntity) {
+        userDao.updateProfile(profile)  // Panggil query update di DAO
+    }
     suspend fun clearProfile() = userDao.clearProfile()
     fun getLapanganById(id: String): Flow<LapanganEntity> = lapanganDao.getLapanganById(id)
 

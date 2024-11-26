@@ -47,15 +47,15 @@ class DetailFragment : Fragment() {
         setupUI()
     }
 
-    override fun onResume() {
-        super.onResume()
-        toggleBottomNavVisibility(View.GONE)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        toggleBottomNavVisibility(View.VISIBLE)
-    }
+//    override fun onResume() {
+//        super.onResume()
+//     //   toggleBottomNavVisibility(View.GONE)
+//    }
+//
+//    override fun onPause() {
+//        super.onPause()
+//     //   toggleBottomNavVisibility(View.VISIBLE)
+//    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -91,10 +91,10 @@ class DetailFragment : Fragment() {
         }
     }
 
-    private fun toggleBottomNavVisibility(visibility: Int) {
-        val bottomNav = requireActivity().findViewById<View>(R.id.bottomNavigationView)
-        bottomNav.visibility = visibility
-    }
+//    private fun toggleBottomNavVisibility(visibility: Int) {
+//        val bottomNav = requireActivity().findViewById<View>(R.id.bottomNavigationView)
+//        bottomNav.visibility = visibility
+//    }
 
     private fun observeLapanganData(id: String, tanggal: String) {
         detailViewModel.getLapById(id, tanggal).observe(viewLifecycleOwner) { resource ->

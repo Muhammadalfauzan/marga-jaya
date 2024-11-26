@@ -1,12 +1,14 @@
 package com.example.kamandanoe.ui.history
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class AdapterBooking(
+    private val context: Context,
     private val onItemClick: (BookingItemModel) -> Unit // Fungsi untuk menangani klik item
 ) : ListAdapter<BookingItemModel, AdapterBooking.BookingViewHolder>(DIFF_CALLBACK) {
 
@@ -48,21 +51,25 @@ class AdapterBooking(
                 "success" -> {
                     statusTextView.setBackgroundResource(R.drawable.bg_status_success) // Hijau
                     statusTextView.text = "Success"
+                    statusTextView.setTextColor(ContextCompat.getColor(context,R.color.green))
                     binding.tvLihat.visibility = View.VISIBLE
                 }
                 "pending" -> {
                     statusTextView.setBackgroundResource(R.drawable.bg_status_pending) // Kuning
                     statusTextView.text = "Pending"
+                    statusTextView.setTextColor(ContextCompat.getColor(context, R.color.yellow))
                     binding.tvLihat.visibility = View.GONE
                 }
                 "expired" -> {
                     statusTextView.setBackgroundResource(R.drawable.bg_status_pending) // Merah
                     statusTextView.text = "Expired"
+                    statusTextView.setTextColor(ContextCompat.getColor(context, R.color.red))
                     binding.tvLihat.visibility = View.GONE
                 }
                 else -> {
                     statusTextView.setBackgroundResource(R.drawable.bg_status_pending) // Default jika ada
                     statusTextView.text = "Unknown"
+                    statusTextView.setTextColor(ContextCompat.getColor(context, R.color.red))
                     binding.tvLihat.visibility = View.GONE
                 }
             }

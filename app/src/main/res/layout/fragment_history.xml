@@ -7,6 +7,14 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".ui.history.HistoryFragment">
+    <!-- Background Biru -->
+    <View
+        android:id="@+id/background_header"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/primary"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <ImageView
         android:id="@+id/iv_noInternet"
@@ -31,39 +39,55 @@
         android:visibility="gone"
         android:layout_marginTop="340dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider" />
+        app:layout_constraintTop_toBottomOf="@+id/card_tab_layout" />
     <!-- TabLayout for navigating between tabs -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout"
+
+    <!-- CardView untuk TabLayout -->
+    <!-- CardView for TabLayout -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginHorizontal="16dp"
+        app:cardCornerRadius="90dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/primary"
+        app:cardElevation="10dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@color/white"
-        app:tabIndicatorColor="@color/primary"
-        app:tabGravity="fill" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginHorizontal="16sp"
-        app:layout_constraintTop_toBottomOf="@id/tab_layout" />
-
+        <!-- TabLayout -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabGravity="center"
+            app:tabIndicatorFullWidth="true"
+            app:tabIndicatorGravity="stretch"
+            app:tabMode="fixed"
+            android:background="@color/primary"
+            app:tabPaddingStart="50dp"
+            app:tabPaddingEnd="50dp"
+            app:tabIndicatorAnimationMode="elastic"
+            app:tabIndicator="@drawable/tab_selected_bg"
+            app:tabSelectedTextColor="@color/primary"
+            app:tabIndicatorColor="@color/white"
+            app:tabTextColor="@color/white">
+            <!-- Dummy Tab Items for Preview -->
+        </com.google.android.material.tabs.TabLayout>
+    </androidx.cardview.widget.CardView>
     <!-- ViewPager2 for handling tab content -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintTop_toBottomOf="@id/divider"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" >
-
-
-    </androidx.viewpager2.widget.ViewPager2>
+        app:layout_constraintTop_toBottomOf="@+id/background_header" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

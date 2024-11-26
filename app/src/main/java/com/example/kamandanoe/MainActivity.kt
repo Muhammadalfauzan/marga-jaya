@@ -2,6 +2,7 @@ package com.example.kamandanoe
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.View
@@ -31,25 +32,117 @@ class MainActivity : AppCompatActivity() {
         // Setup Toolbar
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-
+        setupBackButton()
         // Setup Navigation
         setupNavigation()
     }
 
     private fun setupNavigation() {
         val navHostFragment = binding.navHostFragment.getFragment<NavHostFragment>()
-
         val navController = navHostFragment.navController
 
-        // Connect BottomNavigationView to NavController
+        // Hubungkan BottomNavigationView dengan NavController
         binding.bottomNavigationView.setupWithNavController(navController)
-
-        // Setup navigation indicator for BottomNavigationView
         setupNavigationIndicator(navController)
-
-        // Handle navigation destination changes
+        // Listener untuk perubahan destinasi
         navController.addOnDestinationChangedListener { _, destination, _ ->
             updateToolbar(destination.id)
+            updateBottomNavVisibility(destination.id)
+            invalidateOptionsMenu()
+        }
+    }
+    /**
+     * Update BottomNavigationView visibility based on current fragment
+     */
+    private fun updateBottomNavVisibility(destinationId: Int) {
+        // Hide BottomNavigationView in specific fragments
+        val fragmentsToHideBottomNav = listOf(
+            R.id.detailFragment,
+            R.id.changePasswordFragment,
+            R.id.changeProfileFragment,
+            R.id.buktiFragment
+        )
+
+        binding.bottomNavigationView.visibility = if (destinationId in fragmentsToHideBottomNav) View.GONE else View.VISIBLE
+    }
+    private fun updateToolbar(destinationId: Int) {
+        // Toolbar selalu terlihat
+        binding.toolbar.visibility = View.VISIBLE
+
+        // App Icon hanya di HomeFragment
+        binding.appIcon.visibility = if (destinationId == R.id.homeFragment) View.VISIBLE else View.GONE
+        // Show Back Button only in DetailFragment or fragments with hidden BottomNavigationView
+        val fragmentsWithBackButton = listOf(
+            R.id.detailFragment,
+            R.id.changePasswordFragment,
+            R.id.changeProfileFragment,
+            R.id.buktiFragment
+        )
+        binding.imageButton.visibility = if (destinationId in fragmentsWithBackButton) View.VISIBLE else View.GONE
+
+        // Perbarui judul Toolbar
+        setToolbarTitle(destinationId)
+    }
+
+    /**
+     * Handle Back Button Action
+     */
+    private fun setupBackButton() {
+        binding.imageButton.setOnClickListener {
+            handleBackButtonAction()
+        }
+    }
+    /**
+     * Handle Back Button Navigation
+     */
+    private fun handleBackButtonAction() {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        // Navigate back using NavController
+        if (!navController.popBackStack()) {
+            // If no fragments left in back stack, exit the app
+            finish()
+        }
+    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.home_menu, menu) // Menu dimuat
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val destinationId = findNavController(R.id.nav_host_fragment).currentDestination?.id
+        Log.d("MenuDebug", "Current Destination: $destinationId")
+
+        menu?.apply {
+            findItem(R.id.more)?.isVisible = destinationId == R.id.homeFragment
+        }
+
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+
+    /**
+     * Update Toolbar title dynamically based on destination ID
+     */
+    private fun setToolbarTitle(destinationId: Int) {
+        val title = when (destinationId) {
+            R.id.homeFragment -> ""
+            R.id.historyFragment -> getString(R.string.title_history)
+            R.id.profileFragment -> getString(R.string.title_profile)
+            R.id.detailFragment -> getString(R.string.title_detail)
+            R.id.changePasswordFragment -> getString(R.string.title_change_password)
+            R.id.changeProfileFragment -> getString(R.string.title_change_profile)
+            R.id.buktiFragment -> getString(R.string.title_bukti)
+            else -> getString(R.string.app_name)
+        }
+
+        val toolbarTitle = binding.toolbar.findViewById<TextView>(R.id.tv_tolbar)
+        if (destinationId == R.id.homeFragment) {
+            toolbarTitle.visibility = View.GONE // Hide title in HomeFragment
+        } else {
+            toolbarTitle.visibility = View.VISIBLE // Show title in other fragments
+            toolbarTitle.text = title
         }
     }
 
@@ -118,60 +211,14 @@ class MainActivity : AppCompatActivity() {
     private val Int.dp: Int
         get() = (this * resources.displayMetrics.density).toInt()
 
-    // Update visibility of BottomNavigationView
-    private fun updateBottomNavVisibility(destinationId: Int) {
-        binding.bottomNavigationView.visibility = if (destinationId.shouldHideBottomNav()) View.GONE else View.VISIBLE
-    }
 
-    // Update Toolbar for specific destination
-    private fun updateToolbar(destinationId: Int) {
-        setToolbarTitle(destinationId)
-        invalidateOptionsMenu()
-    }
+//    // Update Toolbar for specific destination
+//    private fun updateToolbar(destinationId: Int) {
+//        setToolbarTitle(destinationId)
+//        invalidateOptionsMenu()
+//    }
 
-    // Synchronize BottomNavigationView with current fragment
-    private fun syncBottomNavWithDestination(destinationId: Int) {
-        when (destinationId) {
-            R.id.homeFragment -> binding.bottomNavigationView.selectedItemId = R.id.homeFragment
-            R.id.historyFragment -> binding.bottomNavigationView.selectedItemId = R.id.historyFragment
-            R.id.profileFragment -> binding.bottomNavigationView.selectedItemId = R.id.profileFragment
-        }
-    }
 
-    // Set Toolbar title based on destination ID
-    private fun setToolbarTitle(destinationId: Int) {
-        val title = when (destinationId) {
-            R.id.homeFragment -> "Home"
-            R.id.historyFragment -> "History"
-            R.id.profileFragment -> "Profile"
-            R.id.detailFragment -> "Detail"
-            else -> "App Title"
-        }
-        binding.toolbar.findViewById<TextView>(R.id.tv_tolbar).text = title
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.home_menu, menu)
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val destinationId = findNavController(R.id.nav_host_fragment).currentDestination?.id
-        menu?.findItem(R.id.toolbar)?.isVisible = destinationId.shouldShowMenu()
-        menu?.findItem(R.id.logout)?.isVisible = destinationId == R.id.profileFragment
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        val destinationId = findNavController(R.id.nav_host_fragment).currentDestination?.id
-        destinationId?.let { updateBottomNavVisibility(it) }
-    }
-
-    // Extension function to check if BottomNavigationView should be hidden
-    private fun Int.shouldHideBottomNav(): Boolean {
-        return this == R.id.detailFragment || this == R.id.buktiFragment
-    }
 
     // Extension function to check if toolbar menu should be shown
     private fun Int?.shouldShowMenu(): Boolean {
@@ -179,3 +226,18 @@ class MainActivity : AppCompatActivity() {
     }
 
 }
+
+//override fun onResume() {
+//        super.onResume()
+//        val destinationId = findNavController(R.id.nav_host_fragment).currentDestination?.id
+//        destinationId?.let { updateBottomNavVisibility(it) }
+//    }
+//// Update visibility of BottomNavigationView
+//private fun updateBottomNavVisibility(destinationId: Int) {
+//    binding.bottomNavigationView.visibility = if (destinationId.shouldHideBottomNav()) View.GONE else View.VISIBLE
+//}
+//
+//    // Extension function to check if BottomNavigationView should be hidden
+//    private fun Int.shouldHideBottomNav(): Boolean {
+//        return this == R.id.detailFragment || this == R.id.buktiFragment
+//    }

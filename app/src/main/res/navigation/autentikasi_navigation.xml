@@ -14,7 +14,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.margajaya.ui.autentikasi.RegisterFragment"
+        android:name="com.example.kamandanoe.ui.autentikasi.RegisterFragment"
         android:label="RegisterFragment">
         <action
             android:id="@+id/action_registerFragment_to_loginFragment"

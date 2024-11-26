@@ -35,7 +35,7 @@ class UpcomingFragment : Fragment() {
     lateinit var networkStatusListener: NetworkMonitor
     // Adapter dengan click listener untuk navigasi
     private val adapterBooking by lazy {
-        AdapterBooking { bookingItem ->
+        AdapterBooking(requireContext()) { bookingItem ->
             navigateToDetail(bookingItem)
         }
     }

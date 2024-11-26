@@ -11,4 +11,5 @@ interface UserUseCase {
 
     suspend fun updateUser(updateUserModel: UpdateUserModel): Resource<UpdateUserResponse>
     suspend fun clearProfileCache()
+
 }

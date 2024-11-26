@@ -46,11 +46,21 @@
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" >
 
+        <action
+            android:id="@+id/action_profileFragment_to_changePasswordFragment"
+            app:destination="@id/changePasswordFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_changeProfileFragment"
+            app:destination="@id/changeProfileFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_notifikasiFragment"
+            app:destination="@id/notifikasiFragment" />
     </fragment>
     <fragment
         android:id="@+id/buktiFragment"
         android:name="com.example.kamandanoe.ui.buktibooking.BuktiFragment"
         android:label="fragment_bukti"
+
         tools:layout="@layout/fragment_bukti" >
         <argument
             android:name="jenisLapangan"
@@ -76,7 +86,8 @@
 
         <action
             android:id="@+id/action_upcomingFragment_to_buktiFragment"
-            app:destination="@id/buktiFragment" >
+            app:destination="@id/buktiFragment"
+            app:popUpToInclusive="false">
             <argument
                 android:name="jenisLapangan"
                 app:argType="string" />
@@ -99,5 +110,20 @@
         android:name="com.example.kamandanoe.ui.history.FinishedFragment"
         android:label="fragment_finished"
         tools:layout="@layout/fragment_finished" />
+    <fragment
+        android:id="@+id/changePasswordFragment"
+        android:name="com.example.kamandanoe.ui.editakun.ChangePasswordFragment"
+        android:label="fragment_change_password"
+        tools:layout="@layout/fragment_change_password" />
+    <fragment
+        android:id="@+id/changeProfileFragment"
+        android:name="com.example.kamandanoe.ui.editakun.ChangeProfileFragment"
+        android:label="fragment_change_profile"
+        tools:layout="@layout/fragment_change_profile" />
+    <fragment
+        android:id="@+id/notifikasiFragment"
+        android:name="com.example.kamandanoe.ui.editakun.NotifikasiFragment"
+        android:label="fragment_notifikasi"
+        tools:layout="@layout/fragment_notifikasi" />
 
 </navigation>
