@@ -53,7 +53,6 @@ class BookingViewModel @Inject constructor(
                         val pastBooking = filterPastBookings(allBookings)
                         _upcomingBookings.value = Resource.Success(upcoming)
                         _pastBookings.value = Resource.Success(pastBooking)
-                        // Schedule notifications for upcoming bookings
                         allBookings.forEach { bookingItem ->
                             if (bookingItem.status == "success") {
                                 scheduleNotification(bookingItem)
@@ -62,7 +61,6 @@ class BookingViewModel @Inject constructor(
                     }
                     is Resource.Error -> {
                         Log.d("BookingViewModel", "Error message received: '${resource.message}'")
-
                         if (resource.message?.trim() == "Session expired. Please log in again.") {
                             Log.d("BookingViewModel", "Session expired triggered")
                             authPreferences.clearUserData()

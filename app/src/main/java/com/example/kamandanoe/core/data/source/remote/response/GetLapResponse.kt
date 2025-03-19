@@ -10,7 +10,6 @@ data class GetLapResponse(
     @field:SerializedName("success")
     val success: Boolean? = null
 )
-
 data class SesiLapangan(
 
     @field:SerializedName("jam_mulai")
@@ -22,13 +21,11 @@ data class SesiLapangan(
     @field:SerializedName("jam_berakhir")
     val jamBerakhir: String? = null
 )
-
 data class ImageItem(
 
     @field:SerializedName("imageUrl")
     val imageUrl: String? = null
 )
-
 data class JenisLapangan(
 
     @field:SerializedName("id")

@@ -7,6 +7,7 @@ import com.example.kamandanoe.core.domain.model.RegisterModel
 
 
 interface AuthRepository {
-    suspend fun registerUser(registerModel: RegisterModel): Resource<Unit>
+
     suspend fun loginUser(loginModel: LoginModel): Resource<LoginResponse>
+    suspend fun registerUser(registerModel: RegisterModel): Resource<Unit>
 }

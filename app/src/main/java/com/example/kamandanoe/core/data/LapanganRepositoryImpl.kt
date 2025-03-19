@@ -14,16 +14,13 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class LapanganRepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
 ) : LapanganRepository {
-
     override fun getLapangan(tanggal: String): Flow<Resource<List<LapanganModel>>> =
         object : NetworkBoundResource<List<LapanganModel>, List<LapanganItem>>() {
-
             // Memuat data dari database lokal
             override fun loadFromDB(): Flow<List<LapanganModel>> {
                 return localDataSource.getAllLapangan().map { entities ->
@@ -62,6 +59,7 @@ class LapanganRepositoryImpl @Inject constructor(
                         val lapanganModel = resource.data?.let { DataMapper.mapResponseToModel(it) }
                         Resource.Success(lapanganModel!!)
                     }
+
                     is Resource.Loading -> Resource.Loading()
                     is Resource.Error -> Resource.Error(resource.message ?: "Unknown error")
                 }

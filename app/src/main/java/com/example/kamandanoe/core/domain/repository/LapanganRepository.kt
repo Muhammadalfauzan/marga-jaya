@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface LapanganRepository {
     fun getLapangan(tanggal: String): Flow<Resource<List<LapanganModel>>>
-
     fun getLapById(id: String, tanggal: String): Flow<Resource<LapanganModel>>
 
 }

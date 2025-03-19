@@ -14,6 +14,20 @@ class AuthRepositoryImpl @Inject constructor(
     private val authPreferences: AuthPreferences
 ) : AuthRepository {
 
+    override suspend fun loginUser(loginModel: LoginModel): Resource<LoginResponse> {
+        return try {
+            val response = apiService.login(loginModel)
+            if (response.success == true && response.data?.token != null) {
+                authPreferences.saveAuthToken(response.data.token)
+                authPreferences.saveEmail(loginModel.email) // Simpan token
+                Resource.Success(response)
+            } else {
+                Resource.Error(response.message ?: "Login failed")
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.localizedMessage ?: "An error occurred")
+        }
+    }
     override suspend fun registerUser(registerModel: RegisterModel): Resource<Unit> {
         return try {
             apiService.register(registerModel)
@@ -23,18 +37,4 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun loginUser(loginModel: LoginModel): Resource<LoginResponse> {
-        return try {
-            val response = apiService.login(loginModel)
-            if (response.success == true && response.data?.token != null) {
-                authPreferences.saveAuthToken(response.data.token)
-                authPreferences.saveEmail(loginModel.email)// Simpan token
-                Resource.Success(response)
-            } else {
-                Resource.Error(response.message ?: "Login failed")
-            }
-        } catch (e: Exception) {
-            Resource.Error(e.localizedMessage ?: "An error occurred")
-        }
-    }
 }

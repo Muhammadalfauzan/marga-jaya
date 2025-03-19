@@ -18,22 +18,22 @@ import com.example.kamandanoe.AutentikasiActivity
 import com.example.kamandanoe.core.data.Resource
 import com.example.kamandanoe.core.domain.model.BookingItemModel
 import com.example.kamandanoe.core.utils.NetworkMonitor
-import com.example.kamandanoe.databinding.FragmentFinishedBinding
+import com.example.kamandanoe.databinding.FragmentUpcomingBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class UpcomingFragment : Fragment() {
 
-    private var _binding: FragmentFinishedBinding? = null
+    private var _binding: FragmentUpcomingBinding? = null
     private val binding get() = _binding!!
-    private val bookingViewModel: BookingViewModel by viewModels({ requireParentFragment() })
+    private val bookingViewModel: BookingViewModel by viewModels()
+
     @Inject
     lateinit var networkStatusListener: NetworkMonitor
-    // Adapter dengan click listener untuk navigasi
+
     private val adapterBooking by lazy {
         AdapterBooking(requireContext()) { bookingItem ->
             navigateToDetail(bookingItem)
@@ -44,7 +44,7 @@ class UpcomingFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentFinishedBinding.inflate(inflater, container, false)
+        _binding = FragmentUpcomingBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -56,30 +56,27 @@ class UpcomingFragment : Fragment() {
                 setupRecyclerView()
                 observeViewModel()
                 if (bookingViewModel.upcomingBookings.value == null) {
-                    bookingViewModel.getAllBookings() // Panggil jika belum ada data
+                    fetchBookings() // Ambil data saat pertama kali
                 }
             } else {
                 showNoInternetMessage()
             }
-
         }
-
     }
+
+    fun fetchBookings() {
+        bookingViewModel.getAllBookings() // Pastikan fungsi ini tersedia di ViewModel
+    }
+
     private fun showNoInternetMessage() {
         Toast.makeText(requireContext(), "Tidak ada koneksi internet", Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToDetail(bookingItem: BookingItemModel) {
-        // Periksa status pembayaran
         if (bookingItem.status == "success") {
-            // Format sesi: "jamMulai - jamBerakhir"
             val sesi = "${bookingItem.jamMulai ?: ""} - ${bookingItem.jamBerakhir ?: ""}"
-
-            // Format tanggal booking dan tanggal pesan sesuai dengan gambar
             val sformat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX", Locale.getDefault())
-
-            // Format tanggal booking
             val bookingDate = bookingItem.tanggal?.let {
                 try {
                     val parsedDate = inputFormat.parse(it)
@@ -89,7 +86,6 @@ class UpcomingFragment : Fragment() {
                 }
             } ?: "Tanggal tidak tersedia"
 
-            // Format tanggal pesan
             val bookingOrderDate = bookingItem.createdAt?.let {
                 try {
                     val parsedDate = inputFormat.parse(it)
@@ -99,25 +95,24 @@ class UpcomingFragment : Fragment() {
                 }
             } ?: "Tanggal tidak tersedia"
 
-            // Gunakan Safe Args untuk navigasi ke BuktiFragment dengan argumen yang sesuai
             val action = HistoryFragmentDirections.actionHistoryFragmentToBuktiFragment(
                 jenisLapangan = bookingItem.jenisLapangan ?: "Jenis tidak tersedia",
-                tglBooking = bookingOrderDate, // Tanggal pesan
-                sesi = sesi, // Mengirim sesi yang diformat
+                tglBooking = bookingOrderDate,
+                sesi = sesi,
                 harga = bookingItem.harga ?: 0,
-                hari = bookingDate // Tanggal booking
+                hari = bookingDate,
+                name = bookingItem.name ?: "Nama pengguna"
             )
 
             findNavController().navigate(action)
         } else {
-            // Jika pembayaran belum sukses, buka link Midtrans
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(bookingItem.paymentLink))
             startActivity(intent)
         }
     }
 
     private fun setupRecyclerView() {
-        binding.rvFinished.apply {
+        binding.rvUpcoming.apply {
             adapter = adapterBooking
             layoutManager = LinearLayoutManager(requireContext())
         }
@@ -140,7 +135,6 @@ class UpcomingFragment : Fragment() {
         }
 
         bookingViewModel.showSessionExpiredDialog.observe(viewLifecycleOwner) { shouldShow ->
-            Log.d("UpcomingFragment", "showSessionExpiredDialog observed: $shouldShow")
             if (shouldShow) {
                 showSessionExpiredDialog()
                 bookingViewModel.resetSessionExpiredState()
@@ -163,7 +157,6 @@ class UpcomingFragment : Fragment() {
 
     private fun showLoading() {
         binding.progressBar.visibility = View.VISIBLE
-        Log.d("Upcoming", "Loading booking data...")
     }
 
     private fun hideLoading() {
@@ -171,9 +164,9 @@ class UpcomingFragment : Fragment() {
     }
 
     private fun showError(message: String?) {
-        Log.e("UpcomingFragment", "Error loading data: $message")
         Toast.makeText(requireContext(), message ?: "Failed to load data", Toast.LENGTH_LONG).show()
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -1,6 +1,7 @@
 package com.example.kamandanoe.ui.autentikasi
 
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.kamandanoe.MainActivity
@@ -43,16 +45,49 @@ class LoginFragment : Fragment() {
         }
         setupListeners()
         observeViewModel()
-        binding.buttonlog.setOnClickListener {
+        binding.includeCustomButtonLogin.btnLogin.setOnClickListener {
             performLogin()
         }
     }
+    private fun observeViewModel() {
+        loginViewModel.loginResult.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Resource.Loading -> {
+                    showLoading(true)
+                    Log.d("LoginFragment", "Loading...")
+                }
+                is Resource.Success -> {
+                    showLoading(false)
+                    Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
+                    Log.d("LoginFragment", "Login successful, navigating to home")
+
+                    // Pindah ke MainActivity setelah login berhasil
+                    val intent = Intent(requireContext(), MainActivity::class.java)
+                    startActivity(intent)
+                    requireActivity().finish()
+                }
+                is Resource.Error -> {
+                    showLoading(false)
+                    Log.e("LoginFragment", "Login failed: ${result.message}")
+                    Toast.makeText(requireContext(), result.message ?: "Login failed", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+    private fun showLoading(isLoading: Boolean) {
+        binding.includeCustomButtonLogin.apply {
+            btnLogin.isEnabled = !isLoading
+            progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+          //  tvLoading.text = if (isLoading) else getString(R.string.login)
+        }
+    }
+
 
     private fun setupListeners() {
         // Set TextWatchers for validation and enabling the register button
         binding.edEmaillog.addTextChangedListener(createTextWatcher(
             afterTextChanged = {
-                inputValidator.validateUsername(
+                inputValidator.validateEmail(
                     binding.edEmaillog,
                     binding.emaillogLay
                 )
@@ -71,37 +106,13 @@ class LoginFragment : Fragment() {
         ))
     }
 
-    private fun observeViewModel() {
-        loginViewModel.loginResult.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Resource.Loading -> {
-               //     binding.progressBar.visibility = View.VISIBLE
-                    Log.d("LoginFragment", "Loading...")
-                }
-                is Resource.Success -> {
-                 //   binding.progressBar.visibility = View.GONE
-                    Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
-                    Log.d("LoginFragment", "Login successful, navigating to home")
 
-                    // Pindah ke MainActivity setelah login berhasil
-                    val intent = Intent(requireContext(), MainActivity::class.java)
-                    startActivity(intent)
-                    requireActivity().finish()
-                }
-                is Resource.Error -> {
-                  //  binding.progressBar.visibility = View.GONE
-                    Log.e("LoginFragment", "Login failed: ${result.message}")
-                    Toast.makeText(requireContext(), result.message ?: "Login failed", Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-    }
 
     private fun performLogin() {
         val email = binding.edEmaillog.text.toString().trim()
         val password = binding.edPassLog.text.toString().trim()
 
-        if (inputValidator.validateUsername(binding.edEmaillog, binding.emaillogLay) &&
+        if (inputValidator.validateEmail(binding.edEmaillog, binding.emaillogLay) &&
             inputValidator.validatePassword(binding.edPassLog, binding.passlogLay)
         ) {
             val loginModel = LoginModel(email = email, password = password)
@@ -128,7 +139,7 @@ class LoginFragment : Fragment() {
         }
     }
     private fun setEnableButton() {
-        binding.buttonlog.isEnabled = binding.edEmaillog.text?.isNotEmpty() == true &&
+        binding.includeCustomButtonLogin.btnLogin.isEnabled = binding.edEmaillog.text?.isNotEmpty() == true &&
                 binding.edEmaillog.text?.isNotEmpty() == true &&
                 binding.edPassLog.text?.isNotEmpty() == true
     }
@@ -136,4 +147,11 @@ class LoginFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+    override fun onResume() {
+        super.onResume()
+
+        // Pastikan tombol login dinonaktifkan
+        binding.includeCustomButtonLogin.btnLogin.isEnabled = true // Atau kondisi lain yang diperlukan
+    }
+
 }

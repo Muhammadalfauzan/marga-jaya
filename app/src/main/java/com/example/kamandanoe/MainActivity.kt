@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -49,8 +50,10 @@ class MainActivity : AppCompatActivity() {
             updateToolbar(destination.id)
             updateBottomNavVisibility(destination.id)
             invalidateOptionsMenu()
+
         }
     }
+
     /**
      * Update BottomNavigationView visibility based on current fragment
      */
@@ -69,8 +72,9 @@ class MainActivity : AppCompatActivity() {
         // Toolbar selalu terlihat
         binding.toolbar.visibility = View.VISIBLE
 
-        // App Icon hanya di HomeFragment
+
         binding.appIcon.visibility = if (destinationId == R.id.homeFragment) View.VISIBLE else View.GONE
+        binding.tvNameLogo.visibility = if (destinationId == R.id.homeFragment) View.VISIBLE else View.GONE
         // Show Back Button only in DetailFragment or fragments with hidden BottomNavigationView
         val fragmentsWithBackButton = listOf(
             R.id.detailFragment,
@@ -99,9 +103,8 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
 
-        // Navigate back using NavController
+
         if (!navController.popBackStack()) {
-            // If no fragments left in back stack, exit the app
             finish()
         }
     }
@@ -148,10 +151,10 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("RestrictedApi")
     private fun setupNavigationIndicator(navController: NavController) {
-        // Parent BottomNavigationView
+
         val menuView = binding.bottomNavigationView.getChildAt(0) as BottomNavigationMenuView
 
-        // Listener untuk memperbarui indikator pada item yang diklik
+
         binding.bottomNavigationView.setOnItemSelectedListener { menuItem ->
             val index = getMenuItemIndex(menuItem.itemId)
             updateIndicator(index, menuView)
@@ -159,13 +162,13 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        // Listener untuk menyinkronkan indikator saat fragment berubah
+
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val index = getMenuItemIndex(destination.id)
             updateIndicator(index, menuView)
         }
 
-        // Menetapkan indikator default (item pertama)
+
         val defaultIndex = getMenuItemIndex(navController.currentDestination?.id ?: -1)
         updateIndicator(defaultIndex, menuView)
     }

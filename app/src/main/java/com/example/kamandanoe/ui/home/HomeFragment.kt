@@ -38,9 +38,8 @@ class HomeFragment : Fragment(),  SesiBottomSheetFragment.OnSessionSelectedListe
     val viewModel: HomeViewModel by viewModels()
     private lateinit var lapanganAdapter: AdapterHome
     private var pickerDate: String? = null
-
-@Inject
-lateinit var networkMonitor: NetworkMonitor
+    @Inject
+    lateinit var networkMonitor: NetworkMonitor
     @Inject
     lateinit var authPreferences: AuthPreferences
     private lateinit var bottomNavigationView: BottomNavigationView
@@ -49,11 +48,9 @@ lateinit var networkMonitor: NetworkMonitor
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
-
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -69,13 +66,31 @@ lateinit var networkMonitor: NetworkMonitor
         }
     }
 
+    private fun observeLapanganData() {
+        viewModel.lapangan.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> showLoadingIndicator()
+                is Resource.Success -> {
+                    hideLoadingIndicator()
+                    lapanganAdapter.submitList(resource.data)
+                }
+                is Resource.Error -> {
+                    hideLoadingIndicator()
+                    // handleError(resource.message)
+                }
+            }
+        }
+    }
     private fun initializeUI() {
         setupTopBar()
         setupRecyclerView()
         setupBottomNavigationView()
         setupSwipeRefresh()
         setupDateAndSessionPickers()
-        binding.textViewDate.text = viewModel.pickerDate
+        // Observasi perubahan tanggal dan update TextView
+        viewModel.pickerDate.observe(viewLifecycleOwner) { date ->
+            binding.textViewDate.text = date ?: ""
+        }
         setupObservers()
         setupSessionPicker()
     }
@@ -83,10 +98,10 @@ lateinit var networkMonitor: NetworkMonitor
     private fun showNoInternetBottomSheet() {
         val noInternetBottomSheet = NoInternetBottomSheet(object : RetryListener {
             override fun onRetry() {
-                // Panggil ulang fetch data saat tombol Retry ditekan
-                viewModel.fetchLapanganData(viewModel.pickerDate)
+                viewModel.fetchLapanganData(viewModel.pickerDate.value ?: "")
             }
         }, isNetworkAvailable = { isNetworkConnected() })
+
         noInternetBottomSheet.show(parentFragmentManager, "NoInternetBottomSheet")
     }
 
@@ -120,7 +135,7 @@ lateinit var networkMonitor: NetworkMonitor
     private fun setupRecyclerView() {
         binding.rvHomefrag.layoutManager = LinearLayoutManager(requireContext())
         lapanganAdapter = AdapterHome { lapangan ->
-            navigateToDetailFragment(lapangan.id, viewModel.pickerDate)
+            navigateToDetailFragment(lapangan.id, viewModel.pickerDate.value ?: "")
             Toast.makeText(requireContext(), "Detail ${lapangan.jenisLapangan}", Toast.LENGTH_SHORT).show()
         }
         binding.rvHomefrag.adapter = lapanganAdapter
@@ -147,8 +162,6 @@ lateinit var networkMonitor: NetworkMonitor
 
     override fun onResume() {
         super.onResume()
-
-        // Pastikan toolbar sesuai dengan konteks fragment
         setupTopBar()
     }
 
@@ -187,21 +200,6 @@ lateinit var networkMonitor: NetworkMonitor
         ).show()
     }
 
-    private fun observeLapanganData() {
-        viewModel.lapangan.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
-                is Resource.Loading -> showLoadingIndicator()
-                is Resource.Success -> {
-                    hideLoadingIndicator()
-                    lapanganAdapter.submitList(resource.data)
-                }
-                is Resource.Error -> {
-                    hideLoadingIndicator()
-                   // handleError(resource.message)
-                }
-            }
-        }
-    }
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             val todayDate = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault()).format(Date())
@@ -234,8 +232,10 @@ lateinit var networkMonitor: NetworkMonitor
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         // Pastikan untuk menghentikan animasi refresh ketika view dihancurkan
         binding.swipeRefreshLayout.isRefreshing = false
+        _binding = null
     }
 
     private fun showError(message: String?) {

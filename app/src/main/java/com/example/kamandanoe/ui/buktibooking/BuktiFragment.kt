@@ -23,16 +23,18 @@ class BuktiFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val name = args.name
         val jenisLapangan = args.jenisLapangan
         val hari = args.hari
         val sesi = args.sesi
         val harga = args.harga
         val tglBooking = args.tglBooking
 
-        binding.tvJenbukti.text = jenisLapangan
-        binding.tvHaribukti.text = hari
-        binding.tvJambukti.text = sesi
-        binding.tvHargabukti.text = harga.toString()
-        binding.tvWaktupesanbukti.text = tglBooking
+        binding.tvJenisLapangan.text = jenisLapangan
+        binding.tvJamSesi.text = hari
+        binding.tvHariTanggal.text = sesi
+        binding.tvHargaLapangan.text = harga.toString()
+        binding.tvHariPesan.text = tglBooking
+        binding.namaPengguna.text = name
     }
 }

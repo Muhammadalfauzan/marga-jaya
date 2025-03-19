@@ -60,7 +60,6 @@ class RemoteDataSource @Inject constructor(private val apiService: ApiService) {
 
     suspend fun getAllBooking(): Flow<ApiResponse<BookingResponse>> = flow {
         val response = apiService.getAllBooking()
-
         if (response.success == true && response.data != null) {
             emit(ApiResponse.Success(response))
         } else {

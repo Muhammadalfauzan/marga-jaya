@@ -12,6 +12,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.denzcoskun.imageslider.ImageSlider
+import com.denzcoskun.imageslider.constants.ScaleTypes
+import com.denzcoskun.imageslider.models.SlideModel
 import com.example.kamandanoe.R
 import com.example.kamandanoe.core.data.Resource
 import com.example.kamandanoe.core.domain.model.LapanganModel
@@ -27,7 +30,6 @@ class DetailFragment : Fragment() {
 
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
-
     private val detailViewModel: DetailViewModel by viewModels()
     private val paymentViewModel: PaymentViewModel by viewModels()
     private val args: DetailFragmentArgs by navArgs()
@@ -172,12 +174,22 @@ class DetailFragment : Fragment() {
             tvDescdetailfrag.text = lapangan.deskripsi
             btnPesan.isEnabled = lapangan.available
 
-            val imageUrl = lapangan.imageUrls.firstOrNull()
-            Glide.with(this@DetailFragment)
-                .load(imageUrl)
-                .placeholder(R.drawable.appmarga)
-                .error(R.drawable.appmarga)
-                .into(imgSlider)
+            // Prepare image list for ImageSlider
+            val imageList = ArrayList<SlideModel>()
+
+            // Ensure lapangan.imageUrls is not null or empty
+            if (!lapangan.imageUrls.isNullOrEmpty()) {
+                // Add each image URL to the image list as a SlideModel
+                lapangan.imageUrls.forEach { imageUrl ->
+                    imageList.add(SlideModel(imageUrl, scaleType = ScaleTypes.CENTER_CROP))
+                }
+
+                // Set image list to ImageSlider with auto-cycle enabled
+                binding.imageSlider.setImageList(imageList)
+            } else {
+                // Handle case if no images are available (optional)
+                binding.imageSlider.setImageList(imageList) // Empty image list
+            }
         }
     }
 

@@ -93,10 +93,10 @@ class UserRepositoryImpl @Inject constructor(
                 existingProfile?.let {
                     val updatedProfile = ProfileModel(
                         id = it.id, // Gunakan ID yang sama
-                        name = updateUserRequest.name ?: it.name, // Gunakan nama baru atau nama lama
-                        email = updateUserRequest.email ?: it.email, // Gunakan email baru atau email lama
+                        name = updateUserRequest.name ?: it.name,
+                        email = updateUserRequest.email ?: it.email,
                         role = it.role, // Gunakan role lama
-                        noTelp = updateUserRequest.no_telp ?: it.noTelp // Gunakan noTelp baru atau lama
+                        noTelp = updateUserRequest.no_telp ?: it.noTelp
                     )
                     saveProfileToLocal(updatedProfile) // Simpan ke database lokal
                 }

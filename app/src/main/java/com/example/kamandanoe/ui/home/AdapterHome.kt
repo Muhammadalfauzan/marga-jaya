@@ -43,9 +43,12 @@ class AdapterHome(
             binding.tvAkhirhomefrag.text = lapangan.jamBerakhir
             binding.tvHargahomefrag.text = "Rp.${lapangan.harga}"
 
-            itemView.setOnClickListener {
-                onItemClick(lapangan) // Menangani klik item
+            binding.btnDetailHome.setOnClickListener {
+                onItemClick(lapangan)
             }
+//            itemView.setOnClickListener {
+//                onItemClick(lapangan) // Menangani klik item
+//            }
         }
     }
 

@@ -5,14 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:animateLayoutChanges="true"
     tools:context=".ui.history.HistoryFragment">
     <!-- Background Biru -->
-    <View
+    <LinearLayout
         android:id="@+id/background_header"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:background="@color/primary"
+        android:orientation="horizontal"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -68,7 +72,7 @@
             app:tabIndicatorFullWidth="true"
             app:tabIndicatorGravity="stretch"
             app:tabMode="fixed"
-            android:background="@color/primary"
+            android:background="@color/status_bar"
             app:tabPaddingStart="50dp"
             app:tabPaddingEnd="50dp"
             app:tabIndicatorAnimationMode="elastic"
@@ -76,10 +80,8 @@
             app:tabSelectedTextColor="@color/primary"
             app:tabIndicatorColor="@color/white"
             app:tabTextColor="@color/white">
-            <!-- Dummy Tab Items for Preview -->
         </com.google.android.material.tabs.TabLayout>
     </androidx.cardview.widget.CardView>
-    <!-- ViewPager2 for handling tab content -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager"
         android:layout_width="match_parent"

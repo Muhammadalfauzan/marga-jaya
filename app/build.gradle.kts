@@ -94,6 +94,8 @@ android {
         ksp(libs.androidx.room.compiler)
         implementation(libs.androidx.room.ktx)
 
+        implementation ("com.github.denzcoskun:ImageSlideshow:0.1.2")
+        implementation ("androidx.core:core-splashscreen:1.0.0")
         implementation(libs.hilt.android)
         ksp(libs.hilt.android.compiler)
     }

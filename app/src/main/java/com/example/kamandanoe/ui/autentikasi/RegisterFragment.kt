@@ -1,5 +1,6 @@
 package com.example.kamandanoe.ui.autentikasi
 
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.kamandanoe.R
@@ -15,7 +17,6 @@ import com.example.kamandanoe.core.data.Resource
 import com.example.kamandanoe.core.domain.model.RegisterModel
 import com.example.kamandanoe.databinding.FragmentRegisterBinding
 import dagger.hilt.android.AndroidEntryPoint
-
 
 @AndroidEntryPoint
 class RegisterFragment : Fragment() {
@@ -35,13 +36,19 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         observeViewModel()
-
         setupListeners()
+        binding.includeCustomButtonPass.btnLogin.isEnabled = false
+        setButtonColor(isEnabled = false)
+        binding.includeCustomButtonPass.tvLoading.text = getString(R.string.register)
 
+        binding.login.setOnClickListener {
+            findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
+        }
     }
+
     private fun setupListeners() {
-        // Set TextWatchers for validation and enabling the register button
         binding.edUsername.addTextChangedListener(createTextWatcher(
             afterTextChanged = { inputValidator.validateUsername(binding.edUsername, binding.nameLay) }
         ))
@@ -54,55 +61,42 @@ class RegisterFragment : Fragment() {
             afterTextChanged = { inputValidator.validatePassword(binding.edPass, binding.passLay) }
         ))
 
-        binding.edConfirm.addTextChangedListener(createTextWatcher(
-            afterTextChanged = { inputValidator.validateConfirm(binding.edConfirm, binding.confirmLay, binding.edPass) }
-        ))
+        binding.edConfirm.addTextChangedListener(createTextWatcher()) // Tidak perlu validasi konfirmasi password
 
         binding.edTelp.addTextChangedListener(createTextWatcher(
             afterTextChanged = { inputValidator.validateTel(binding.edTelp, binding.telLay) }
         ))
 
-        // Set listener for enabling/disabling register button based on input completeness
+        // Aktifkan tombol hanya jika semua input telah diisi
         listOf(binding.edUsername, binding.edEmail, binding.edPass, binding.edConfirm, binding.edTelp).forEach {
-            it.addTextChangedListener(createTextWatcher(onTextChanged = { setEnableButton() }))
+            it.addTextChangedListener(createTextWatcher(onTextChanged = { validateForm() }))
         }
 
-
-
-    binding.btnRegist.setOnClickListener {
-            // Handle registration
-            val registerModel = RegisterModel(
-                name = binding.edUsername.text.toString(),
-                email = binding.edEmail.text.toString(),
-                password = binding.edPass.text.toString(),
-                no_telp = binding.edTelp.text.toString(),
-                confirm_password = binding.edConfirm.text.toString()
-            )
-            registerViewModel.registerUser(registerModel)
+        binding.includeCustomButtonPass.btnLogin.setOnClickListener {
+            if (validateForm()) {
+                showProgressBar()
+                performRegister()
+            }
         }
     }
 
     private fun observeViewModel() {
         registerViewModel.registerResult.observe(viewLifecycleOwner) { result ->
             when (result) {
-                is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                }
+                is Resource.Loading -> showProgressBar()
                 is Resource.Success -> {
-                    binding.progressBar.visibility = View.GONE
+                    hideProgressBar()
                     Toast.makeText(requireContext(), "Registrasi berhasil!", Toast.LENGTH_LONG).show()
-
-                    // Contoh tindakan setelah registrasi berhasil
-                    // Misalnya, navigasi kembali ke halaman login
                     findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 }
                 is Resource.Error -> {
-                    binding.progressBar.visibility = View.GONE
+                    hideProgressBar()
                     Toast.makeText(requireContext(), result.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
+
     private fun createTextWatcher(
         onTextChanged: (() -> Unit)? = null,
         afterTextChanged: (() -> Unit)? = null
@@ -119,12 +113,61 @@ class RegisterFragment : Fragment() {
             }
         }
     }
-    private fun setEnableButton() {
-        binding.btnRegist.isEnabled = binding.edUsername.text?.isNotEmpty() == true &&
-                binding.edEmail.text?.isNotEmpty() == true &&
-                binding.edPass.text?.isNotEmpty() == true &&
-                binding.edConfirm.text?.isNotEmpty() == true &&
-                binding.edTelp.text?.isNotEmpty() == true
+
+    private fun validateForm(): Boolean {
+        val isUsernameFilled = binding.edUsername.text?.isNotEmpty() == true
+        val isEmailFilled = binding.edEmail.text?.isNotEmpty() == true
+        val isPasswordFilled = binding.edPass.text?.isNotEmpty() == true
+        val isConfirmFilled = binding.edConfirm.text?.isNotEmpty() == true
+        val isTelpFilled = binding.edTelp.text?.isNotEmpty() == true
+
+        val isFormValid = isUsernameFilled && isEmailFilled && isPasswordFilled && isConfirmFilled && isTelpFilled
+
+        binding.includeCustomButtonPass.btnLogin.isEnabled = isFormValid
+        setButtonColor(isFormValid)
+
+        // Pastikan teks tombol selalu "Register"
+        binding.includeCustomButtonPass.tvLoading.text = getString(R.string.register)
+
+        return isFormValid
     }
 
+    private fun setButtonColor(isEnabled: Boolean) {
+        val buttonColor = if (isEnabled) {
+            ContextCompat.getColor(requireContext(), R.color.primary)
+        } else {
+            ContextCompat.getColor(requireContext(), R.color.second)
+        }
+
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.bg_button) as GradientDrawable
+        drawable.setColor(buttonColor)
+        binding.includeCustomButtonPass.btnLogin.background = drawable
+    }
+
+    private fun showProgressBar() {
+        binding.includeCustomButtonPass.progressBar.visibility = View.VISIBLE
+        binding.includeCustomButtonPass.btnLogin.isEnabled = false
+    }
+
+    private fun hideProgressBar() {
+        binding.includeCustomButtonPass.progressBar.visibility = View.GONE
+        binding.includeCustomButtonPass.btnLogin.isEnabled = true
+    }
+
+    private fun performRegister() {
+        val registerModel = RegisterModel(
+            name = binding.edUsername.text.toString(),
+            email = binding.edEmail.text.toString(),
+            password = binding.edPass.text.toString(),
+            confirm_password = binding.edConfirm.text.toString(), // Tetap dikirim tapi tidak divalidasi
+            no_telp = binding.edTelp.text.toString()
+        )
+
+        registerViewModel.registerUser(registerModel)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

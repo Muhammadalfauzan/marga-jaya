@@ -17,7 +17,6 @@ import javax.inject.Singleton
 class BookingRepositoryImpl @Inject constructor(
     private val remoteDataSource: RemoteDataSource
 ) : BookingRepository {
-
     private var isDataLoaded = false
 
     override fun getAllBooking(): Flow<Resource<List<BookingDataModel>>> =
@@ -26,7 +25,6 @@ class BookingRepositoryImpl @Inject constructor(
             override suspend fun createCall(): Flow<ApiResponse<BookingResponse>> {
                 return remoteDataSource.getAllBooking()
             }
-
         }.asFlow()
             .map { resource ->
                 when (resource) {
@@ -39,14 +37,12 @@ class BookingRepositoryImpl @Inject constructor(
                         isDataLoaded = true
                         Resource.Success(bookingDataModels)
                     }
-
                     is Resource.Loading -> Resource.Loading()
                     is Resource.Error -> {
                         Log.d(
                             "BookingRepositoryImpl",
                             "Error message from API: ${resource.message}"
                         )
-
                         if (resource.message == "jwt expired") {
                             Log.d("BookingRepositoryImpl", "Session expired detected in repository")
                             Resource.Error("jwt expired")

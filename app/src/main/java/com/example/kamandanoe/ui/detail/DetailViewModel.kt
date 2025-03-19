@@ -16,7 +16,6 @@ class DetailViewModel @Inject constructor(
     private val lapanganUseCase: LapanganUseCase
 ) : ViewModel() {
 
-    // Fungsi untuk mendapatkan detail lapangan berdasarkan ID dan tanggal
     fun getLapById(id: String, tanggal: String): LiveData<Resource<LapanganModel>> {
         return lapanganUseCase.getLapById(id, tanggal).asLiveData()
     }

@@ -9,6 +9,7 @@
         <item name="android:windowBackground">@color/white</item>
 <!--        <item name="colorControlHighlight">@android:color/transparent</item>-->
         <item name="colorControlHighlight">#80FFFFFF</item>
+        <item name="android:statusBarColor">@color/status_bar</item>
     </style>
 
     <style name="Theme.Margajaya" parent="Base.Theme.Margajaya" />

@@ -20,7 +20,24 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
-
+    @Provides
+    fun provideApiService(client: OkHttpClient): ApiService {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://margajaya.vercel.app/api/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+        return retrofit.create(ApiService::class.java)
+    }
+    @Provides
+    fun provideOkHttpClient(authInterceptor: Interceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .connectTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .build()
+    }
     @Provides
     fun provideAuthInterceptor(authPreferences: AuthPreferences): Interceptor {
         return Interceptor { chain ->
@@ -34,25 +51,6 @@ class NetworkModule {
         }
     }
 
-    @Provides
-    fun provideOkHttpClient(authInterceptor: Interceptor): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(authInterceptor) // Tambahkan authInterceptor di sini
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .connectTimeout(120, TimeUnit.SECONDS)
-            .readTimeout(120, TimeUnit.SECONDS)
-            .build()
-    }
-
-    @Provides
-    fun provideApiService(client: OkHttpClient): ApiService {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://margajaya.vercel.app/api/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
-        return retrofit.create(ApiService::class.java)
-    }
 
     @Provides
     @Singleton

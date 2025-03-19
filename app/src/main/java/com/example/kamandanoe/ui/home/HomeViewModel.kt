@@ -15,14 +15,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
-
+// private val networkUtils: NetworkUtils
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val lapanganUseCase: LapanganUseCase,
-   // private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
-    var pickerDate: String = getCurrentDate()
+    private val _pickerDate = MutableLiveData(getCurrentDate()) // LiveData untuk tanggal yang dipilih
+    val pickerDate: LiveData<String> get() = _pickerDate
+
     private val _lapangan = MutableLiveData<Resource<List<LapanganModel>>>()
     val lapangan: LiveData<Resource<List<LapanganModel>>> get() = _lapangan
 
@@ -33,7 +34,7 @@ class HomeViewModel @Inject constructor(
     val originalDataList: LiveData<List<LapanganModel>> get() = _originalDataList
 
     init {
-        fetchLapanganData(pickerDate)
+        fetchLapanganData(_pickerDate.value ?: getCurrentDate())
     }
 
     private fun getCurrentDate(): String {
@@ -42,22 +43,27 @@ class HomeViewModel @Inject constructor(
 
     fun fetchLapanganData(tanggal: String) {
         _lapangan.postValue(Resource.Loading())
-        resetSessionFilter()
+
         viewModelScope.launch {
             lapanganUseCase.getLapangan(tanggal).collect { resource ->
-                _lapangan.postValue(resource)
-                if (resource is Resource.Success) {
-                    val data = resource.data ?: emptyList()
-                    _originalDataList.postValue(data)
-                } else if (resource is Resource.Error) {
-                    _originalDataList.postValue(emptyList())
+                when (resource) {
+                    is Resource.Success -> {
+                        val data = resource.data ?: emptyList()
+                        _originalDataList.postValue(data)
+                        _lapangan.postValue(Resource.Success(data))
+                    }
+                    is Resource.Error -> {
+                        _originalDataList.postValue(emptyList())
+                        _lapangan.postValue(resource) // Menampilkan error langsung
+                    }
+                    else -> Unit
                 }
             }
         }
     }
 
     fun updatePickerDate(newDate: String) {
-        pickerDate = newDate
+        _pickerDate.value = newDate
         fetchLapanganData(newDate)
     }
 
@@ -65,7 +71,6 @@ class HomeViewModel @Inject constructor(
         _selectedSession.value = session
         applySessionFilter(session)
     }
-
 
     private fun applySessionFilter(session: String) {
         val dataList = _originalDataList.value.orEmpty()
@@ -76,10 +81,6 @@ class HomeViewModel @Inject constructor(
             dataList.filter { it.jamMulai.trim() == sessionStartTime }
         }
         _lapangan.postValue(Resource.Success(filteredData))
-    }
-
-    fun resetSessionFilter() {
-        _selectedSession.value = "Semua Sesi"
     }
 }
 

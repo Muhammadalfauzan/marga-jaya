@@ -6,5 +6,6 @@ import com.example.kamandanoe.core.domain.model.PaymentModel
 
 
 interface PaymentRepository {
+
     suspend fun processPayment(paymentModel: PaymentModel): Resource<PaymentResponse>
 }

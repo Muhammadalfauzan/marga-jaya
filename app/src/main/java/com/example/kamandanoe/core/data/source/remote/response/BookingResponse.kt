@@ -21,7 +21,6 @@ data class Booking(
 )
 
 data class BookingItem(
-
     @field:SerializedName("jam_mulai")
     val jamMulai: String? = null,
 

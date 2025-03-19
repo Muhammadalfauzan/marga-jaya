@@ -11,14 +11,6 @@ import javax.inject.Inject
 class AuthInteractor @Inject constructor(
     private val authRepository: AuthRepository
 ) : AuthUseCase {
-
-    override suspend fun registerUser(registerModel: RegisterModel): Resource<Unit> {
-        return try {
-            authRepository.registerUser(registerModel)
-        } catch (e: Exception) {
-            Resource.Error(e.localizedMessage ?: "Registration failed")
-        }
-    }
     override suspend fun loginUser(loginModel: LoginModel): Resource<LoginResponse> {
         return try {
             // Memanggil login dari repository dan mengembalikan hasil sebagai Resource
@@ -27,4 +19,12 @@ class AuthInteractor @Inject constructor(
             Resource.Error(e.localizedMessage ?: "Login failed")
         }
     }
+    override suspend fun registerUser(registerModel: RegisterModel): Resource<Unit> {
+        return try {
+            authRepository.registerUser(registerModel)
+        } catch (e: Exception) {
+            Resource.Error(e.localizedMessage ?: "Registration failed")
+        }
+    }
+
 }

@@ -60,15 +60,9 @@ class AdapterBooking(
                     statusTextView.setTextColor(ContextCompat.getColor(context, R.color.yellow))
                     binding.tvLihat.visibility = View.GONE
                 }
-                "expired" -> {
-                    statusTextView.setBackgroundResource(R.drawable.bg_status_pending) // Merah
-                    statusTextView.text = "Expired"
-                    statusTextView.setTextColor(ContextCompat.getColor(context, R.color.red))
-                    binding.tvLihat.visibility = View.GONE
-                }
                 else -> {
                     statusTextView.setBackgroundResource(R.drawable.bg_status_pending) // Default jika ada
-                    statusTextView.text = "Unknown"
+                    statusTextView.text = "Expired"
                     statusTextView.setTextColor(ContextCompat.getColor(context, R.color.red))
                     binding.tvLihat.visibility = View.GONE
                 }

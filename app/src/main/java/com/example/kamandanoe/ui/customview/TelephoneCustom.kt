@@ -37,7 +37,7 @@ class TelephoneCustom : AppCompatEditText {
                 val telePhone = s.toString()
 
                 when{
-                    telePhone.isEmpty() -> setError("email tidak boleh kosong")
+                    telePhone.isEmpty() -> setError("nomor telephone tidak boleh kosong")
 
                     else -> error = null
                 }

@@ -43,9 +43,10 @@
     <string name="session_expired_title">Session Expired</string>
     <string name="session_expired_message">Your session has expired. Please login again.</string>
     <string name="login">Login</string>
+    <string name="register">Register</string>
     <string name="error_default_message">An error occurred. Please try again later.</string>
 
-    <string name="say_hello_home">Booking lapangan jadi lebih gampang di Kamandanoe </string>
+    <string name="say_hello_home">Booking lapangan jadi lebih gampang di Jawara Kalasan </string>
 
     <string name="image_description">Image</string>
     <string name="jenis_lap">Jenis Lapangan</string>

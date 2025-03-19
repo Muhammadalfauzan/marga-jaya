@@ -4,11 +4,12 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#0e59a8</color>
     <color name="second">#accee9</color>
+    <color name="status_bar">#3F94ED</color>
     <color name="green">#349542</color>
     <color name="yellow">#FBC02D</color>
     <color name="red">#F11919</color>
     <color name="gray">#151515</color>
     <color name="shadow">#cc222222</color>
-    <color name="light_grey">#E6E3E3</color>
+    <color name="light_grey">#5CF6F5F5</color>
 
 </resources>
