@@ -35,6 +35,6 @@ class BuktiFragment : Fragment() {
         binding.tvHariTanggal.text = sesi
         binding.tvHargaLapangan.text = harga.toString()
         binding.tvHariPesan.text = tglBooking
-        binding.namaPengguna.text = name
+        binding.namaPengguna.text = name // aagit
     }
 }
